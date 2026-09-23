@@ -1,11 +1,11 @@
 // Konfigurasi Firebase
 const firebaseConfig = {
-apiKey: "AIzaSyD9XT8pSNqOykugsb7Cv5rO-BNOcCh4440",
-  authDomain: "ats-kelas-5.firebaseapp.com",
-  projectId: "ats-kelas-5",
-  storageBucket: "ats-kelas-5.firebasestorage.app",
-  messagingSenderId: "548455920485",
-  appId: "1:548455920485:web:4fa898fb5d31c2b102a78c"
+apiKey: "AIzaSyC2p0rMRZO8-oeElmDupoSMesAqox4d4_o",
+  authDomain: "ats-kelas-6.firebaseapp.com",
+  projectId: "ats-kelas-6",
+  storageBucket: "ats-kelas-6.firebasestorage.app",
+  messagingSenderId: "480741142678",
+  appId: "1:480741142678:web:1cee92b3f95459faacd2b7"
 };
 
 // Inisialisasi Firebase
