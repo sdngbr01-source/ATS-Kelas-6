@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - ATS 2026</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        /* Dekorasi background */
+        body::before,
+        body::after {
+            content: '';
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.4;
+            z-index: 0;
+        }
+        body::before {
+            width: 400px;
+            height: 400px;
+            background: #2563eb;
+            top: -100px;
+            left: -100px;
+        }
+        body::after {
+            width: 350px;
+            height: 350px;
+            background: #7c3aed;
+            bottom: -100px;
+            right: -100px;
+        }
+        
+        .login-container {
+            position: relative;
+            z-index: 1;
+            background: rgba(255,255,255,0.98);
+            border-radius: 32px;
+            padding: 40px;
+            width: 100%;
+            max-width: 440px;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+            animation: fadeInUp 0.6s ease;
+        }
+        
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .login-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .info-badge {
+            background: #dbeafe;
+            color: #1e40af;
+            padding: 6px 14px;
+            border-radius: 30px;
+            display: inline-block;
+            font-size: 0.7rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+        
+        .login-header h2 {
+            font-size: 1.7rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #2563eb, #7c3aed);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .login-header p {
+            color: #64748b;
+            font-size: 0.85rem;
+        }
+        
+        .form-group {
+            margin-bottom: 18px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #334155;
+            font-size: 0.85rem;
+        }
+        
+        .form-group label i {
+            color: #3b82f6;
+            margin-right: 4px;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 16px 20px;
+            border: 2px solid #e2e8f0;
+            border-radius: 20px;
+            font-size: 1.05rem;
+            transition: all 0.3s;
+            font-family: 'Inter', sans-serif;
+            background: #f8fafc;
+            text-align: center;
+            letter-spacing: 2px;
+            font-weight: 600;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59,130,246,0.15);
+            background: white;
+        }
+        
+        .form-group input::placeholder {
+            letter-spacing: normal;
+            font-weight: 400;
+            color: #94a3b8;
+        }
+        
+        .btn-login {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #2563eb, #1e40af);
+            color: white;
+            border: none;
+            border-radius: 40px;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .btn-login:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px -5px rgba(37,99,235,0.4);
+        }
+        
+        .btn-login:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        .login-footer {
+            text-align: center;
+            margin-top: 25px;
+        }
+        
+        .login-footer a {
+            color: #64748b;
+            text-decoration: none;
+            font-size: 0.85rem;
+            transition: color 0.3s;
+        }
+        
+        .login-footer a:hover {
+            color: #2563eb;
+        }
+        
+        .alert {
+            background: #fee2e2;
+            color: #dc2626;
+            padding: 12px 16px;
+            border-radius: 16px;
+            margin-bottom: 20px;
+            font-size: 0.85rem;
+            display: none;
+            align-items: center;
+            gap: 8px;
+            animation: shake 0.4s;
+        }
+        
+        .alert.show {
+            display: flex;
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+        
+        /* Loading spinner */
+        .spinner {
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Info box untuk siswa */
+        .info-box {
+            background: #f0f9ff;
+            border-left: 4px solid #3b82f6;
+            padding: 12px 16px;
+            border-radius: 12px;
+            margin-top: 20px;
+            font-size: 0.8rem;
+            color: #1e40af;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+        }
+        
+        .info-box i {
+            margin-top: 2px;
+            color: #3b82f6;
+        }
+        
+        @media (max-width: 480px) {
+            .login-container { padding: 30px 20px; }
+            .login-header h2 { font-size: 1.4rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-header">
+            <div class="info-badge"><i class="fas fa-shield-alt"></i> ATS Ganjil 2026</div>
+            <h2 id="role-title"><i class="fas fa-graduation-cap"></i> Login Siswa</h2>
+            <p id="role-subtitle">Masukkan NISN untuk memulai ujian</p>
+        </div>
+        
+        <div id="alertBox" class="alert">
+            <i class="fas fa-exclamation-circle"></i>
+            <span id="alertMessage">Error message</span>
+        </div>
+        
+        <!-- FORM (TANPA atribut required, validasi via JS) -->
+        <form id="loginForm" novalidate>
+            
+            <!-- ============ FORM SISWA ============ -->
+            <div id="formSiswa">
+                <div class="form-group">
+                    <label><i class="fas fa-id-card"></i> NISN</label>
+                    <input type="text" 
+                           id="nisn" 
+                           placeholder="Masukkan NISN" 
+                           autocomplete="off"
+                           inputmode="numeric"
+                           maxlength="20">
+                </div>
+                
+                <div class="info-box">
+                    <i class="fas fa-info-circle"></i>
+                    <div>Cukup masukkan NISN yang terdaftar. Data kelas dan nama akan otomatis terisi.</div>
+                </div>
+            </div>
+            
+            <!-- ============ FORM ADMIN ============ -->
+            <div id="formAdmin" style="display: none;">
+                <div class="form-group">
+                    <label><i class="fas fa-user"></i> Username</label>
+                    <input type="text" 
+                           id="adminUsername" 
+                           placeholder="Masukkan Username"
+                           autocomplete="off">
+                </div>
+                
+                <div class="form-group">
+                    <label><i class="fas fa-lock"></i> Password</label>
+                    <input type="password" 
+                           id="adminPassword" 
+                           placeholder="Masukkan Password"
+                           autocomplete="current-password">
+                </div>
+            </div>
+            
+            <button type="submit" class="btn-login" id="loginBtn">
+                <i class="fas fa-arrow-right-to-bracket"></i>
+                <span>Login Sekarang</span>
+            </button>
+        </form>
+        
+        <div class="login-footer">
+            <a href="index.html"><i class="fas fa-home"></i> Kembali ke Beranda</a>
+        </div>
+    </div>
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+    <script src="js/firebase-config.js"></script>
+    
+    <script>
+    // ============================================================
+    // LOGIN - REBUILD 2025
+    // Siswa: hanya NISN (tanpa password)
+    // Admin: username + password
+    // ============================================================
+    
+    const urlParams = new URLSearchParams(window.location.search);
+    const role = (urlParams.get('role') || 'siswa').toLowerCase();
+    
+    console.log('🔍 Role:', role);
+    
+    // ==================== ELEMEN ====================
+    const roleTitle = document.getElementById('role-title');
+    const roleSubtitle = document.getElementById('role-subtitle');
+    const formSiswa = document.getElementById('formSiswa');
+    const formAdmin = document.getElementById('formAdmin');
+    const inputNisn = document.getElementById('nisn');
+    const inputAdminUser = document.getElementById('adminUsername');
+    const inputAdminPass = document.getElementById('adminPassword');
+    
+    // ==================== SETUP TAMPILAN ====================
+    if (role === 'admin') {
+        roleTitle.innerHTML = '<i class="fas fa-user-tie"></i> Login Admin';
+        roleSubtitle.textContent = 'Masukkan username dan password admin';
+        formSiswa.style.display = 'none';
+        formAdmin.style.display = 'block';
+    } else {
+        roleTitle.innerHTML = '<i class="fas fa-graduation-cap"></i> Login Siswa';
+        roleSubtitle.textContent = 'Masukkan NISN untuk memulai ujian';
+        formSiswa.style.display = 'block';
+        formAdmin.style.display = 'none';
+    }
+    
+    // ==================== ALERT HELPER ====================
+    function showAlert(message, type = 'error') {
+        const alertBox = document.getElementById('alertBox');
+        const alertMessage = document.getElementById('alertMessage');
+        
+        alertMessage.textContent = message;
+        
+        if (type === 'error') {
+            alertBox.style.background = '#fee2e2';
+            alertBox.style.color = '#dc2626';
+        } else if (type === 'success') {
+            alertBox.style.background = '#dcfce7';
+            alertBox.style.color = '#166534';
+        } else if (type === 'info') {
+            alertBox.style.background = '#dbeafe';
+            alertBox.style.color = '#1e40af';
+        }
+        
+        alertBox.classList.add('show');
+        
+        clearTimeout(window._alertTimer);
+        window._alertTimer = setTimeout(() => {
+            alertBox.classList.remove('show');
+        }, 5000);
+    }
+    
+    // ==================== CEK JAM AKSES ====================
+    function isSchoolHourWIB() {
+        const hour = new Date().getHours();
+        // Jam 07:00 - 11:59
+        return hour >= 7 && hour < 12;
+    }
+    
+    // ==================== LOADING STATE ====================
+    function setLoading(isLoading) {
+        const btn = document.getElementById('loginBtn');
+        if (isLoading) {
+            btn.disabled = true;
+            btn.innerHTML = '<div class="spinner"></div><span>Memproses...</span>';
+        } else {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-arrow-right-to-bracket"></i><span>Login Sekarang</span>';
+        }
+    }
+    
+    // ==================== HANDLE LOGIN ====================
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        console.log('🚀 Form submitted. Role:', role);
+        
+        // ==================== LOGIN SISWA ====================
+        if (role === 'siswa') {
+            const nisn = (inputNisn?.value || '').trim();
+            
+            console.log('📝 NISN:', nisn);
+            
+            if (!nisn) {
+                showAlert('NISN wajib diisi!');
+                inputNisn?.focus();
+                return;
+            }
+            
+            setLoading(true);
+            
+            try {
+                // Cek jam akses
+                if (!isSchoolHourWIB()) {
+                    showAlert('Akses hanya diperbolehkan pada jam sekolah (07.00 - 12.00 WIB)!');
+                    setLoading(false);
+                    return;
+                }
+                
+                // Cek db tersedia
+                if (typeof db === 'undefined') {
+                    showAlert('Database belum siap. Refresh halaman.');
+                    setLoading(false);
+                    return;
+                }
+                
+                // Cari siswa berdasarkan NISN
+                const siswaQuery = await db.collection('users')
+                    .where('nis', '==', nisn)
+                    .where('role', '==', 'siswa')
+                    .limit(1)
+                    .get();
+                
+                if (siswaQuery.empty) {
+                    showAlert('NISN tidak ditemukan! Periksa kembali NISN Anda.');
+                    setLoading(false);
+                    return;
+                }
+                
+                const siswaDoc = siswaQuery.docs[0];
+                const siswaData = siswaDoc.data();
+                
+                if (!siswaData.kelas) {
+                    showAlert('Data kelas tidak ditemukan. Hubungi admin.');
+                    setLoading(false);
+                    return;
+                }
+                
+                // Simpan session
+                sessionStorage.setItem('currentUser', JSON.stringify({
+                    id: siswaDoc.id,
+                    ...siswaData
+                }));
+                
+                console.log('✅ Login berhasil:', siswaData.nama, '- Kelas', siswaData.kelas);
+                showAlert(`Selamat datang, ${siswaData.nama}!`, 'success');
+                
+                setTimeout(() => {
+                    window.location.href = 'dashboard-siswa.html';
+                }, 800);
+                
+            } catch (error) {
+                console.error('❌ Login error:', error);
+                showAlert('Terjadi kesalahan: ' + error.message);
+                setLoading(false);
+            }
+        }
+        // ==================== LOGIN ADMIN ====================
+        else if (role === 'admin') {
+            const username = (inputAdminUser?.value || '').trim();
+            const password = (inputAdminPass?.value || '').trim();
+            
+            console.log('👤 Admin:', username);
+            
+            if (!username || !password) {
+                showAlert('Username dan password wajib diisi!');
+                return;
+            }
+            
+            setLoading(true);
+            
+            try {
+                if (username === 'admin' && password === '20524756') {
+                    console.log('✅ Kredensial cocok, simpan session...');
+                    
+                    sessionStorage.setItem('currentUser', JSON.stringify({
+                        id: 'admin1',
+                        nama: 'Administrator',
+                        role: 'admin'
+                    }));
+                    
+                    showAlert('Login berhasil! Mengalihkan...', 'success');
+                    
+                    console.log('🚀 Redirect ke dashboard-admin.html');
+                    
+                    setTimeout(() => {
+                        window.location.href = 'dashboard-admin.html';
+                    }, 800);
+                } else {
+                    console.log('❌ Kredensial salah');
+                    showAlert('Username atau password admin salah!');
+                    setLoading(false);
+                }
+            } catch (error) {
+                console.error('❌ Error login admin:', error);
+                showAlert('Terjadi kesalahan: ' + error.message);
+                setLoading(false);
+            }
+        }
+    });
+    
+    // ==================== AUTO FOCUS ====================
+    setTimeout(() => {
+        if (role === 'admin') {
+            inputAdminUser?.focus();
+        } else {
+            inputNisn?.focus();
+        }
+    }, 300);
+    
+    // ==================== ENTER DI USERNAME ADMIN → PINDAH KE PASSWORD ====================
+    inputAdminUser?.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            inputAdminPass?.focus();
+        }
+    });
+    </script>
+</body>
+</html>
