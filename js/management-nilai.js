@@ -1,5 +1,5 @@
 // management-nilai.js
-// Manajemen nilai - Auto koreksi PG, PGK, BS
+// Manajemen nilai - Auto koreksi PG, PGK, BS + Sorting A-Z
 
 // ==================== KONFIGURASI ====================
 const POIN_PER_SOAL = 5; // Nilai maksimal per soal untuk semua tipe
@@ -51,6 +51,21 @@ async function loadNilai() {
             return true;
         });
         
+        // ✅ SORTING ALFABETIS berdasarkan nama siswa (A-Z), lalu mapel
+        filteredData.sort((a, b) => {
+            const namaCompare = (a.siswaNama || '').toString().localeCompare(
+                (b.siswaNama || '').toString(),
+                'id',
+                { numeric: true, sensitivity: 'base' }
+            );
+            if (namaCompare !== 0) return namaCompare;
+            return (a.mataPelajaran || '').toString().localeCompare(
+                (b.mataPelajaran || '').toString(),
+                'id',
+                { sensitivity: 'base' }
+            );
+        });
+        
         if (filteredData.length === 0) {
             tbody.innerHTML = '<tr><td colspan="9" style="text-align: center">Tidak ada data sesuai filter</td></tr>';
             return;
@@ -92,13 +107,7 @@ async function loadNilai() {
     }
 }
 
-// ==================== FUNGSI AUTO KOREKSI (DIPANGGIL SAAT SUBMIT UJIAN) ====================
-/**
- * Fungsi untuk mengoreksi jawaban siswa secara otomatis
- * @param {Object} jawabanSiswa - { pg: {qId: 'A'}, pgk: {qId: 'A,C'}, bs: {qId: 'B,S,B'} }
- * @param {Object} kunciJawaban - { pg: {qId: 'A'}, pgk: {qId: 'A,C'}, bs: {qId: 'B,S,B'} }
- * @returns {Object} - { nilaiPG, nilaiPGK, nilaiBS, totalPG, totalPGK, totalBS, nilaiAkhir, detail }
- */
+// ==================== FUNGSI AUTO KOREKSI ====================
 function autoKoreksi(jawabanSiswa, kunciJawaban) {
     const detail = { pg: {}, pgk: {}, bs: {} };
     
@@ -183,17 +192,9 @@ function autoKoreksi(jawabanSiswa, kunciJawaban) {
 }
 
 // ==================== HITUNG NILAI PGK ====================
-/**
- * Aturan PGK:
- * - Persis sama (jumlah & isi) → 5
- * - Kurang/lebih tanpa salah → 2.5
- * - Ada jawaban salah → 1
- * - Benar 0 → 0
- */
 function hitungNilaiPGK(jawabanSiswa, kunci) {
     if (!jawabanSiswa || !kunci) return 0;
     
-    // Parse jawaban jadi array huruf, buang spasi
     const parseArr = (str) => {
         return String(str)
             .toUpperCase()
@@ -209,7 +210,6 @@ function hitungNilaiPGK(jawabanSiswa, kunci) {
     if (arrKunci.length === 0) return 0;
     if (arrJawaban.length === 0) return 0;
     
-    // Hitung B (benar, ada di kunci) dan S (salah, tidak ada di kunci)
     let B = 0;
     let S = 0;
     
@@ -247,10 +247,6 @@ function hitungNilaiPGK(jawabanSiswa, kunci) {
 }
 
 // ==================== HITUNG NILAI BS ====================
-/**
- * Aturan BS: proporsional
- * nilai = (jumlah benar / jumlah pernyataan) × 5
- */
 function hitungNilaiBS(jawabanSiswa, kunci) {
     if (!jawabanSiswa || !kunci) return 0;
     
@@ -267,7 +263,6 @@ function hitungNilaiBS(jawabanSiswa, kunci) {
     
     if (arrKunci.length === 0) return 0;
     
-    // Hitung jumlah benar
     let benar = 0;
     const total = arrKunci.length;
     
@@ -277,7 +272,6 @@ function hitungNilaiBS(jawabanSiswa, kunci) {
         }
     }
     
-    // Proporsional
     return (benar / total) * POIN_PER_SOAL;
 }
 
@@ -289,12 +283,11 @@ function escapeHtml(text) {
     return div.innerHTML;
 }
 
-// ========== TAMBAHKAN CSS (CEK APAKAH SUDAH ADA) ==========
+// ========== TAMBAHKAN CSS ==========
 if (!document.getElementById('management-nilai-style')) {
     const styleTag = document.createElement('style');
     styleTag.id = 'management-nilai-style';
     styleTag.textContent = `
-        /* Tombol Batalkan Koreksi */
         .btn-batal-koreksi {
             background: #ffc107;
             color: #333;
@@ -317,7 +310,6 @@ if (!document.getElementById('management-nilai-style')) {
             transform: scale(0.98);
         }
         
-        /* Status Badge */
         .status-pending {
             background: #ffc107;
             color: #333;
