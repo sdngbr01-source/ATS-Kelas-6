@@ -1,5 +1,5 @@
 // management-user.js
-// Manajemen user (siswa) dengan cache
+// Manajemen user (siswa) dengan cache + sorting A-Z
 
 let userCache = null;
 let lastUserFetch = 0;
@@ -21,7 +21,7 @@ async function loadUsers(forceRefresh = false) {
         return;
     }
     
-    tbody.innerHTML = '专栏<td colspan="5" style="text-align: center;">Loading...<专栏/tr>';
+    tbody.innerHTML = '<tr><td colspan="5" style="text-align: center;">Loading...</td></tr>';
     
     try {
         let query = usersRef.where('role', '==', 'siswa');
@@ -37,6 +37,13 @@ async function loadUsers(forceRefresh = false) {
             users.push({ id: doc.id, ...doc.data() });
         });
         
+        // ✅ SORTING ALFABETIS berdasarkan nama (A-Z)
+        users.sort((a, b) => {
+            const namaA = (a.nama || '').toString();
+            const namaB = (b.nama || '').toString();
+            return namaA.localeCompare(namaB, 'id', { numeric: true, sensitivity: 'base' });
+        });
+        
         // Simpan ke cache
         userCache = {
             key: cacheKey,
@@ -48,13 +55,13 @@ async function loadUsers(forceRefresh = false) {
         
     } catch (error) {
         console.error('Error loading users:', error);
-        tbody.innerHTML = '专栏<td colspan="5" style="text-align: center; color: red;">Error: ' + error.message + '<专栏/tr>';
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: red;">Error: ' + error.message + '</td></tr>';
     }
 }
 
 function renderUserTable(users, tbody) {
     if (!users || users.length === 0) {
-        tbody.innerHTML = '专栏<td colspan="5" style="text-align: center;">Tidak ada data siswa<专栏/tr>';
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align: center;">Tidak ada data siswa</td></tr>';
         return;
     }
     
@@ -68,8 +75,8 @@ function renderUserTable(users, tbody) {
         row.insertCell(2).textContent = user.nama || '-';
         row.insertCell(3).textContent = user.kelas || '-';
         row.insertCell(4).innerHTML = `
-            <button class="btn-reset" onclick="resetPassword('${user.id}', '${user.nama}')" style="background:#ffc107; border:none; padding:4px 8px; border-radius:4px; margin-right:5px; cursor:pointer;">🔑 Reset</button>
-            <button class="btn-delete" onclick="deleteUser('${user.id}', '${user.nama}')" style="background:#dc3545; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer;">🗑 Hapus</button>
+            <button class="btn-reset" onclick="resetPassword('${user.id}', '${escapeHtml(user.nama)}')" style="background:#ffc107; border:none; padding:4px 8px; border-radius:4px; margin-right:5px; cursor:pointer;">🔑 Reset</button>
+            <button class="btn-delete" onclick="deleteUser('${user.id}', '${escapeHtml(user.nama)}')" style="background:#dc3545; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer;">🗑 Hapus</button>
         `;
     });
 }
@@ -161,6 +168,14 @@ async function handleFileUpload(input) {
         }
     };
     reader.readAsArrayBuffer(file);
+}
+
+// Escape HTML helper
+function escapeHtml(text) {
+    if (!text) return '';
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
 }
 
 // Event listener
