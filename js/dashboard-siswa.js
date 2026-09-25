@@ -68,7 +68,6 @@ async function loadSubjects() {
 // ==================== START EXAM ====================
 async function startExam(examId, subjectName) {
     try {
-        // Cek sudah pernah mengerjakan
         const existingAnswer = await answersRef
             .where('examId', '==', examId)
             .where('siswaId', '==', currentUser.id)
@@ -88,7 +87,6 @@ async function startExam(examId, subjectName) {
         
         currentExam = { id: examId, ...examDoc.data() };
         
-        // Ambil semua soal
         const questionsSnapshot = await questionsRef
             .where('kelas', '==', currentExam.kelas)
             .where('mataPelajaran', '==', currentExam.mataPelajaran)
@@ -103,7 +101,6 @@ async function startExam(examId, subjectName) {
             return;
         }
         
-        // Filter berdasarkan tipe
         const examJumlahSoal = currentExam.jumlahSoal || {};
         const pgQuestions = allQuestions.filter(q => q.tipe === 'pg');
         const pgkQuestions = allQuestions.filter(q => q.tipe === 'pgk');
@@ -124,7 +121,6 @@ async function startExam(examId, subjectName) {
             return;
         }
         
-        // Set nilai per soal
         const nilaiSetting = currentExam.nilaiPerSoal || { pg: 5, pgk: 5, bs: 5 };
         currentQuestions = currentQuestions.map(q => {
             if (!q.nilai) {
@@ -186,7 +182,6 @@ function showQuestion() {
         <div class="question-point">Nilai: ${question.nilai || 0} poin</div>
     `;
     
-    // Gambar soal
     if (question.gambar && question.gambar.trim() !== '') {
         html += `
             <div class="question-image-container">
@@ -200,10 +195,8 @@ function showQuestion() {
         `;
     }
     
-    // Teks soal
     html += `<div class="question-text">${question.soal || 'Soal tidak tersedia'}</div>`;
     
-    // ==================== RENDER PER TIPE ====================
     if (question.tipe === 'pg') {
         html += renderPG(question);
     } else if (question.tipe === 'pgk') {
@@ -212,7 +205,6 @@ function showQuestion() {
         html += renderBS(question);
     }
     
-    // Navigasi
     html += `<div class="navigation-buttons">`;
     if (currentQuestionIndex > 0) {
         html += `<button class="nav-btn prev" onclick="prevQuestion()">← Sebelumnya</button>`;
@@ -307,7 +299,7 @@ function renderBS(question) {
         html += `
             <div class="tf-item">
                 <div class="tf-number">${idx + 1}.</div>
-                <div class="tf-text">${escapeHtml(textPernyataan)}</div>
+                <div class="tf-text">${textPernyataan}</div>
                 <div class="tf-options">
                     <button class="tf-btn" 
                             onclick="selectTrueFalse('${question.id}', ${idx}, 'B')"
@@ -360,14 +352,12 @@ function closeImageModal() {
 }
 
 // ==================== HANDLER JAWABAN ====================
-// PG: pilih 1 jawaban
 function selectOption(questionId, answer) {
     currentAnswers[questionId] = answer;
     showQuestion();
     updateQuestionGrid();
 }
 
-// PGK: toggle multi jawaban
 function toggleMultiOption(questionId, optionLetter) {
     if (!currentAnswers[questionId]) {
         currentAnswers[questionId] = [];
@@ -383,7 +373,6 @@ function toggleMultiOption(questionId, optionLetter) {
     updateQuestionGrid();
 }
 
-// BS: pilih B atau S per pernyataan
 function selectTrueFalse(questionId, pernyataanIndex, jawaban) {
     if (!currentAnswers[questionId]) {
         currentAnswers[questionId] = {};
@@ -393,26 +382,25 @@ function selectTrueFalse(questionId, pernyataanIndex, jawaban) {
     updateQuestionGrid();
 }
 
-// ==================== NAVIGASI ====================
-function nextQuestion() {
-    if (currentQuestionIndex < currentQuestions.length - 1) {
-        currentQuestionIndex++;
-        showQuestion();
-    }
-}
-
-function prevQuestion() {
-    if (currentQuestionIndex > 0) {
-        currentQuestionIndex--;
-        showQuestion();
-    }
-}
-
-function jumpToQuestion(index) {
+// ==================== NAVIGASI (FIXED) ====================
+function goToQuestion(index) {
     if (index >= 0 && index < currentQuestions.length) {
         currentQuestionIndex = index;
         showQuestion();
+        updateQuestionGrid();
     }
+}
+
+function nextQuestion() {
+    goToQuestion(currentQuestionIndex + 1);
+}
+
+function prevQuestion() {
+    goToQuestion(currentQuestionIndex - 1);
+}
+
+function jumpToQuestion(index) {
+    goToQuestion(index);
 }
 
 // ==================== UPDATE GRID ====================
@@ -463,13 +451,11 @@ async function submitExam() {
         }
         const examData = examDoc.data();
         
-        // ========== KONFIGURASI POIN ==========
         const POIN_PER_SOAL = 5;
         const nilaiPGPerSoal = examData.nilaiPerSoal?.pg || POIN_PER_SOAL;
         const nilaiPGKPerSoal = examData.nilaiPerSoal?.pgk || POIN_PER_SOAL;
         const nilaiBSPerSoal = examData.nilaiPerSoal?.bs || POIN_PER_SOAL;
         
-        // ========== VARIABEL ==========
         const jawabanPG = {};
         const jawabanPGK = {};
         const jawabanBS = {};
@@ -478,12 +464,10 @@ async function submitExam() {
         let jmlPG = 0, jmlPGK = 0, jmlBS = 0;
         const detailKoreksi = { pg: {}, pgk: {}, bs: {} };
         
-        // ========== LOOP SETIAP SOAL ==========
         for (const question of currentQuestions) {
             const jawabanSiswa = currentAnswers[question.id];
             const tipe = question.tipe;
             
-            // ---------- PG ----------
             if (tipe === 'pg') {
                 jmlPG++;
                 const jawabanStr = String(jawabanSiswa || '').trim().toUpperCase();
@@ -510,7 +494,6 @@ async function submitExam() {
                     nilaiMaksimal: nilaiPGPerSoal
                 };
             }
-            // ---------- PGK ----------
             else if (tipe === 'pgk') {
                 jmlPGK++;
                 const jawabanArr = Array.isArray(jawabanSiswa) ? jawabanSiswa : [];
@@ -539,13 +522,11 @@ async function submitExam() {
                     nilaiMaksimal: nilaiPGKPerSoal
                 };
             }
-            // ---------- BS ----------
             else if (tipe === 'bs') {
                 jmlBS++;
                 const jawabanObj = jawabanSiswa || {};
                 const pernyataanList = question.pernyataanBS || [];
                 
-                // Hitung jumlah benar
                 let benar = 0;
                 const detailBS = [];
                 
@@ -590,7 +571,6 @@ async function submitExam() {
             }
         }
         
-        // ========== HITUNG TOTAL ==========
         const totalPG = jmlPG * nilaiPGPerSoal;
         const totalPGK = jmlPGK * nilaiPGKPerSoal;
         const totalBS = jmlBS * nilaiBSPerSoal;
@@ -603,7 +583,6 @@ async function submitExam() {
             nilaiAkhir = Math.round((jumlahNilaiDiperoleh / jumlahNilaiMaksimal) * 100);
         }
         
-        // ========== SIMPAN KE FIRESTORE ==========
         await answersRef.add({
             examId: currentExam.id,
             siswaId: currentUser.id,
@@ -612,12 +591,10 @@ async function submitExam() {
             kelas: currentUser.kelas,
             mataPelajaran: currentExam.mataPelajaran,
             
-            // Jawaban mentah
             jawabanPG: jawabanPG,
             jawabanPGK: jawabanPGK,
             jawabanBS: jawabanBS,
             
-            // Hasil koreksi
             nilaiPG: nilaiPG,
             nilaiPGK: nilaiPGK,
             nilaiBS: nilaiBS,
@@ -625,21 +602,14 @@ async function submitExam() {
             totalPGK: totalPGK,
             totalBS: totalBS,
             
-            // Detail per soal (untuk laporan PDF)
             detailKoreksi: detailKoreksi,
-            
-            // Jumlah soal
             jumlahSoal: { pg: jmlPG, pgk: jmlPGK, bs: jmlBS },
-            
-            // Nilai akhir
             nilaiAkhir: nilaiAkhir,
             
-            // Status: LANGSUNG SELESAI (auto koreksi)
             statusKoreksi: 'selesai',
             waktu: firebase.firestore.FieldValue.serverTimestamp()
         });
         
-        // Tampilkan hasil
         showResults(nilaiPG, nilaiPGK, nilaiBS, totalPG, totalPGK, totalBS, nilaiAkhir);
         
     } catch (error) {
@@ -649,22 +619,13 @@ async function submitExam() {
 }
 
 // ==================== HITUNG NILAI PGK ====================
-/**
- * Aturan PGK:
- * - Persis sama → nilai maksimal
- * - Kurang/lebih tanpa salah → setengah
- * - Ada jawaban salah → 1
- * - Benar 0 → 0
- */
 function hitungNilaiPGK(jawabanArr, kunciArr, nilaiMaks) {
     if (!jawabanArr || jawabanArr.length === 0) return 0;
     if (!kunciArr || kunciArr.length === 0) return 0;
     
-    // Normalisasi ke uppercase
     const jawaban = jawabanArr.map(j => String(j).toUpperCase().trim()).filter(Boolean);
     const kunci = kunciArr.map(k => String(k).toUpperCase().trim()).filter(Boolean);
     
-    // Hitung B (benar, ada di kunci) dan S (salah, tidak ada di kunci)
     let B = 0;
     let S = 0;
     
@@ -678,24 +639,21 @@ function hitungNilaiPGK(jawabanArr, kunciArr, nilaiMaks) {
     
     const K = kunci.length;
     
-    // Persis sama
     if (B === K && S === 0 && jawaban.length === K) {
         return nilaiMaks;
     }
     
-    // Ada jawaban salah
     if (S >= 1 && B >= 1) {
         return 1;
     }
     
-    // Kurang (tidak salah, tapi tidak lengkap)
     if (B >= 1 && S === 0 && B < K) {
         return nilaiMaks / 2;
     }
     
-    // Benar 0
     return 0;
 }
+
 // ==================== SHOW RESULTS ====================
 function showResults(nilaiPG, nilaiPGK, nilaiBS, totalPG, totalPGK, totalBS, nilaiAkhir) {
     const examPage = document.getElementById('examPage');
@@ -711,8 +669,6 @@ function showResults(nilaiPG, nilaiPGK, nilaiBS, totalPG, totalPGK, totalBS, nil
     if (el('resultBS')) el('resultBS').textContent = nilaiBS + ' / ' + totalBS;
     if (el('resultTotal')) el('resultTotal').textContent = 
         (nilaiPG + nilaiPGK + nilaiBS) + ' / ' + (totalPG + totalPGK + totalBS);
-    
-    // Nilai akhir (0-100)
     if (el('resultNilaiAkhir')) el('resultNilaiAkhir').textContent = nilaiAkhir;
 }
 
