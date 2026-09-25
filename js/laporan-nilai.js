@@ -1,7 +1,7 @@
 // ==================== DOWNLOAD LAPORAN EXCEL ====================
 
 // laporan-nilai.js
-// Download laporan per kelas (Excel)
+// Download laporan per kelas (Excel) - Format PG, PGK, BS + Sorting A-Z
 
 async function downloadLaporanKelas() {
     const kelas = document.getElementById('laporanKelas').value;
@@ -28,21 +28,17 @@ async function downloadLaporanKelas() {
         function getWaktuValue(data) {
             if (!data.waktu) return null;
             
-            // Jika sudah berupa Date object
             if (data.waktu instanceof Date) return data.waktu;
             
-            // Jika berupa Firestore Timestamp
             if (data.waktu.toDate && typeof data.waktu.toDate === 'function') {
                 return data.waktu.toDate();
             }
             
-            // Jika berupa string
             if (typeof data.waktu === 'string') {
                 const parsed = new Date(data.waktu);
                 return isNaN(parsed.getTime()) ? null : parsed;
             }
             
-            // Jika berupa number (timestamp)
             if (typeof data.waktu === 'number') {
                 return new Date(data.waktu);
             }
@@ -67,71 +63,29 @@ async function downloadLaporanKelas() {
             }
         });
         
-        // Siapkan data untuk Excel
-        const excelData = [['No', 'NIS', 'Nama Siswa', 'Kelas', 'Mata Pelajaran', 'Nilai PG', 'Nilai Isian', 'Nilai Uraian', 'Total Nilai', 'Status']];
+        // ✅ SORTING ALFABETIS berdasarkan nama siswa (A-Z)
+        const sortedNilai = Array.from(nilaiMap.values()).sort((a, b) => 
+            (a.siswaNama || '').toString().localeCompare(
+                (b.siswaNama || '').toString(),
+                'id',
+                { numeric: true, sensitivity: 'base' }
+            )
+        );
+        
+        // Siapkan data untuk Excel (format baru: PG, PGK, BS)
+        const excelData = [[
+            'No', 'NIS', 'Nama Siswa', 'Kelas', 'Mata Pelajaran',
+            'Nilai PG', 'Nilai PGK', 'Nilai BS', 'Nilai Akhir', 'Status'
+        ]];
         let no = 1;
         
-        for (const [siswaId, nilai] of nilaiMap) {
+        for (const nilai of sortedNilai) {
             // Ambil nilai per tipe
             let nilaiPG = nilai.nilaiPG || 0;
-            let nilaiIsian = nilai.nilaiIsian || 0;
-            let nilaiUraian = nilai.nilaiUraian || 0;
+            let nilaiPGK = nilai.nilaiPGK || 0;
+            let nilaiBS = nilai.nilaiBS || 0;
             
-            // Ambil total maksimal dari data
-            let totalPG = nilai.totalPG || 0;
-            let totalIsian = nilai.totalIsian || 0;
-            let totalUraian = nilai.totalUraian || 0;
-            
-            // Jika total maksimal masih 0, hitung dari jumlah soal
-            if (totalPG === 0 && nilai.jumlahSoal) {
-                const jmlPG = nilai.jumlahSoal.pg || 0;
-                const jmlIsian = nilai.jumlahSoal.isian || 0;
-                const jmlUraian = nilai.jumlahSoal.uraian || 0;
-                
-                // Cari nilai per soal dari data ujian
-                try {
-                    if (nilai.examId) {
-                        const examDoc = await examsRef.doc(nilai.examId).get();
-                        if (examDoc.exists) {
-                            const examData = examDoc.data();
-                            const nilaiPerSoalPG = examData.nilaiPerSoal?.pg || 5;
-                            const nilaiPerSoalIsian = examData.nilaiPerSoal?.isian || 5;
-                            const nilaiPerSoalUraian = examData.nilaiPerSoal?.uraian || 5;
-                            
-                            totalPG = jmlPG * nilaiPerSoalPG;
-                            totalIsian = jmlIsian * nilaiPerSoalIsian;
-                            totalUraian = jmlUraian * nilaiPerSoalUraian;
-                        } else {
-                            // Default jika tidak ada data exam
-                            totalPG = jmlPG * 5;
-                            totalIsian = jmlIsian * 5;
-                            totalUraian = jmlUraian * 5;
-                        }
-                    } else {
-                        totalPG = jmlPG * 5;
-                        totalIsian = jmlIsian * 5;
-                        totalUraian = jmlUraian * 5;
-                    }
-                } catch (e) {
-                    console.warn('Gagal ambil data exam:', e);
-                    totalPG = jmlPG * 5;
-                    totalIsian = jmlIsian * 5;
-                    totalUraian = jmlUraian * 5;
-                }
-            }
-            
-            // Hitung jumlah nilai diperoleh
-            const jumlahDiperoleh = (nilaiPG || 0) + (nilaiIsian || 0) + (nilaiUraian || 0);
-            
-            // Hitung jumlah nilai maksimal
-            const jumlahMaksimal = (totalPG || 0) + (totalIsian || 0) + (totalUraian || 0);
-            
-            // HITUNG TOTAL NILAI AKHIR (0-100)
-            let totalNilai = 0;
-            if (jumlahMaksimal > 0) {
-                totalNilai = (jumlahDiperoleh / jumlahMaksimal) * 100;
-                totalNilai = Math.round(totalNilai);
-            }
+            const nilaiAkhir = nilai.nilaiAkhir || 0;
             
             let statusText = '';
             if (nilai.statusKoreksi === 'pending') {
@@ -147,9 +101,9 @@ async function downloadLaporanKelas() {
                 nilai.kelas || '-',
                 nilai.mataPelajaran || '-',
                 nilaiPG,
-                nilaiIsian,
-                nilaiUraian,
-                totalNilai,
+                nilaiPGK,
+                nilaiBS,
+                nilaiAkhir,
                 statusText
             ]);
         }
@@ -166,9 +120,9 @@ async function downloadLaporanKelas() {
             { wch: 10 },  // Kelas
             { wch: 20 },  // Mata Pelajaran
             { wch: 12 },  // Nilai PG
-            { wch: 12 },  // Nilai Isian
-            { wch: 12 },  // Nilai Uraian
-            { wch: 12 },  // Total Nilai
+            { wch: 12 },  // Nilai PGK
+            { wch: 12 },  // Nilai BS
+            { wch: 12 },  // Nilai Akhir
             { wch: 18 }   // Status
         ];
         
@@ -183,6 +137,7 @@ async function downloadLaporanKelas() {
     }
 }
 
+// ==================== GENERATE PDF LEMBAR JAWABAN ====================
 async function generatePDFSiswa(siswa, jawaban, mapel) {
     return new Promise(async (resolve, reject) => {
         try {
@@ -273,21 +228,14 @@ async function generatePDFSiswa(siswa, jawaban, mapel) {
             doc.text('Tanggal       : ' + new Date().toLocaleDateString('id-ID'), 20, yPos);
             yPos += 15;
             
-            // Hitung ulang total nilai
+            // ========== FORMAT BARU: PG, PGK, BS ==========
             const nilaiPG = jawaban.nilaiPG || 0;
-            const nilaiIsian = jawaban.nilaiIsian || 0;
-            const nilaiUraian = jawaban.nilaiUraian || 0;
+            const nilaiPGK = jawaban.nilaiPGK || 0;
+            const nilaiBS = jawaban.nilaiBS || 0;
             const totalPG = jawaban.totalPG || 0;
-            const totalIsian = jawaban.totalIsian || 0;
-            const totalUraian = jawaban.totalUraian || 0;
-            const total = nilaiPG + nilaiIsian + nilaiUraian;
-            const totalMaks = totalPG + totalIsian + totalUraian;
-            
-            let nilaiAkhir = 0;
-            if (totalMaks > 0) {
-                nilaiAkhir = (total / totalMaks) * 100;
-                nilaiAkhir = Math.round(nilaiAkhir);
-            }
+            const totalPGK = jawaban.totalPGK || 0;
+            const totalBS = jawaban.totalBS || 0;
+            const nilaiAkhir = jawaban.nilaiAkhir || 0;
             
             // Ringkasan Nilai
             doc.setFont(undefined, 'bold');
@@ -295,15 +243,15 @@ async function generatePDFSiswa(siswa, jawaban, mapel) {
             yPos += 8;
             
             doc.setFont(undefined, 'normal');
-            doc.text('   Pilihan Ganda : ' + nilaiPG, 20, yPos);
+            doc.text('   Pilihan Ganda   : ' + nilaiPG + ' / ' + totalPG, 20, yPos);
             yPos += 6;
-            doc.text('   Isian         : ' + nilaiIsian, 20, yPos);
+            doc.text('   PG Kompleks     : ' + nilaiPGK + ' / ' + totalPGK, 20, yPos);
             yPos += 6;
-            doc.text('   Uraian        : ' + nilaiUraian, 20, yPos);
+            doc.text('   Benar/Salah     : ' + nilaiBS + ' / ' + totalBS, 20, yPos);
             yPos += 8;
             
             doc.setFont(undefined, 'bold');
-            doc.text('   TOTAL NILAI   : ' + nilaiAkhir, 20, yPos);
+            doc.text('   NILAI AKHIR     : ' + nilaiAkhir, 20, yPos);
             yPos += 20;
             
             // Detail Jawaban
@@ -324,8 +272,8 @@ async function generatePDFSiswa(siswa, jawaban, mapel) {
             questions.sort((a, b) => (a.nomor || 0) - (b.nomor || 0));
             
             const jawabanPG = jawaban.jawabanPG || {};
-            const jawabanIsian = jawaban.jawabanIsian || {};
-            const jawabanUraian = jawaban.jawabanUraian || {};
+            const jawabanPGK = jawaban.jawabanPGK || {};
+            const jawabanBS = jawaban.jawabanBS || {};
             
             let noSoal = 1;
             for (const question of questions) {
@@ -340,8 +288,8 @@ async function generatePDFSiswa(siswa, jawaban, mapel) {
                 
                 let jenisSoal = '';
                 if (question.tipe === 'pg') jenisSoal = 'PILIHAN GANDA';
-                else if (question.tipe === 'isian') jenisSoal = 'ISIAN SINGKAT';
-                else if (question.tipe === 'uraian') jenisSoal = 'URAIAN';
+                else if (question.tipe === 'pgk') jenisSoal = 'PG KOMPLEKS';
+                else if (question.tipe === 'bs') jenisSoal = 'BENAR/SALAH';
                 
                 doc.text(noSoal++ + '. [' + jenisSoal + ']', 20, yPos);
                 yPos += 6;
@@ -352,6 +300,7 @@ async function generatePDFSiswa(siswa, jawaban, mapel) {
                 doc.text(soalSplit, 25, yPos);
                 yPos += soalSplit.length * 5 + 3;
                 
+                // ---------- PG ----------
                 if (question.tipe === 'pg') {
                     const jawabanBenar = question.kunci;
                     const jawabanData = jawabanPG[question.id];
@@ -374,73 +323,54 @@ async function generatePDFSiswa(siswa, jawaban, mapel) {
                     }
                     doc.setTextColor(0, 0, 0);
                     yPos += 8;
-                    
-                } else if (question.tipe === 'isian') {
+                }
+                // ---------- PGK ----------
+                else if (question.tipe === 'pgk') {
                     const jawabanBenar = question.kunci;
-                    const jawabanData = jawabanIsian[question.id];
-                    const jawabanSiswa = jawabanData?.jawaban || '';
-                    const isCorrect = jawabanSiswa && jawabanSiswa.toLowerCase().trim() === String(jawabanBenar).toLowerCase().trim();
+                    const jawabanData = jawabanPGK[question.id];
+                    let jawabanSiswa = jawabanData?.jawaban || [];
+                    if (Array.isArray(jawabanSiswa)) jawabanSiswa = jawabanSiswa.join(', ');
                     
                     doc.setTextColor(0, 0, 0);
                     doc.text('   Jawaban : ' + (jawabanSiswa || '(tidak dijawab)'), 25, yPos);
                     yPos += 5;
                     
-                    if (isCorrect) {
-                        doc.setTextColor(0, 128, 0);
-                        doc.text('   Status  : BENAR', 25, yPos);
-                    } else {
-                        doc.setTextColor(255, 0, 0);
-                        doc.text('   Status  : SALAH', 25, yPos);
+                    doc.setTextColor(0, 128, 0);
+                    doc.text('   Kunci   : ' + (jawabanBenar || '-'), 25, yPos);
+                    doc.setTextColor(0, 0, 0);
+                    yPos += 5;
+                    
+                    const nilai = jawabanData?.nilai || 0;
+                    doc.text('   Nilai   : ' + nilai, 25, yPos);
+                    yPos += 8;
+                }
+                // ---------- BS ----------
+                else if (question.tipe === 'bs') {
+                    const jawabanData = jawabanBS[question.id];
+                    const pernyataanList = question.pernyataanBS || [];
+                    const jawabanSiswa = jawabanData?.jawaban || {};
+                    
+                    doc.setTextColor(0, 0, 0);
+                    doc.text('   Jawaban:', 25, yPos);
+                    yPos += 5;
+                    
+                    pernyataanList.forEach((item, idx) => {
+                        const jwb = jawabanSiswa[idx] || '-';
+                        const kunci = (item.kunci || item.jawaban || '-').toUpperCase();
+                        const isBenar = jwb === kunci;
+                        const textPernyataan = (item.text || item.pernyataan || '').substring(0, 80);
+                        
+                        doc.setTextColor(isBenar ? 0 : 255, isBenar ? 128 : 0, 0);
+                        doc.text(`     ${idx + 1}. ${textPernyataan}`, 28, yPos);
+                        yPos += 4;
+                        doc.text(`        Jawab: ${jwb} | Kunci: ${kunci} ${isBenar ? '✓' : '✗'}`, 28, yPos);
                         yPos += 5;
-                        doc.setTextColor(0, 128, 0);
-                        doc.text('   Seharusnya : ' + jawabanBenar, 25, yPos);
-                    }
+                    });
+                    
                     doc.setTextColor(0, 0, 0);
+                    const nilai = jawabanData?.nilai || 0;
+                    doc.text('   Nilai   : ' + nilai, 25, yPos);
                     yPos += 8;
-                    
-                } else if (question.tipe === 'uraian') {
-                    const jawabanData = jawabanUraian[question.id];
-                    const jawabanSiswa = jawabanData?.jawaban || '';
-                    const nilaiMaksimal = jawabanData?.nilaiMaksimal || 0;
-                    
-                    let nilai = 0;
-                    if (jawaban.koreksiDetail && jawaban.koreksiDetail[question.id]) {
-                        nilai = jawaban.koreksiDetail[question.id].nilai || 0;
-                    }
-                    
-                    doc.setTextColor(0, 0, 0);
-                    doc.text('   Jawaban :', 25, yPos);
-                    yPos += 5;
-                    
-                    const jawabanSplit = doc.splitTextToSize(jawabanSiswa || '(tidak dijawab)', 165);
-                    doc.text(jawabanSplit, 30, yPos);
-                    yPos += jawabanSplit.length * 5 + 3;
-                    
-                    if (nilai === nilaiMaksimal) {
-                        doc.setTextColor(0, 128, 0);
-                    } else if (nilai > 0) {
-                        doc.setTextColor(255, 165, 0);
-                    } else {
-                        doc.setTextColor(255, 0, 0);
-                    }
-                    doc.text('   Nilai : ' + nilai, 25, yPos);  // Hanya tampilkan nilai perolehan
-                    doc.setTextColor(0, 0, 0);
-                    yPos += 8;
-                    
-                    if (nilai < nilaiMaksimal && jawaban.koreksiDetail && jawaban.koreksiDetail[question.id]?.catatan) {
-                        doc.setTextColor(100, 100, 100);
-                        doc.text('   Catatan : ' + jawaban.koreksiDetail[question.id].catatan, 25, yPos);
-                        doc.setTextColor(0, 0, 0);
-                        yPos += 6;
-                    }
-                    
-                    if (question.kunci && question.kunci.trim() !== '') {
-                        doc.setTextColor(0, 128, 0);
-                        doc.text('   Kunci Jawaban : ' + question.kunci, 25, yPos);
-                        doc.setTextColor(0, 0, 0);
-                        yPos += 6;
-                    }
-                    yPos += 5;
                 }
                 yPos += 5;
             }
