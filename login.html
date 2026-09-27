@@ -384,7 +384,7 @@
     function isSchoolHourWIB() {
         const hour = new Date().getHours();
         // Jam 07:00 - 11:59
-        return hour >= 7 && hour < 24;
+        return (hour > 7 || (hour === 7 && minute >= 30)) && hour < 12;
     }
     
     // ==================== LOADING STATE ====================
@@ -422,7 +422,7 @@
             try {
                 // Cek jam akses
                 if (!isSchoolHourWIB()) {
-                    showAlert('Akses hanya diperbolehkan pada jam sekolah (07.00 - 12.00 WIB)!');
+                    showAlert('Akses hanya diperbolehkan pada jam sekolah (07.30 - 12.00 WIB)!');
                     setLoading(false);
                     return;
                 }
