@@ -21,7 +21,6 @@
             overflow-x: hidden;
         }
 
-        /* Background Pattern */
         body::before {
             content: '';
             position: fixed;
@@ -42,7 +41,7 @@
             z-index: 2;
         }
 
-        /* Header Styles */
+        /* ==================== HEADER ==================== */
         .header {
             text-align: center;
             margin-bottom: 50px;
@@ -95,7 +94,7 @@
             box-shadow: 0 4px 6px rgba(0,0,0,0.05);
         }
 
-        /* Role Cards */
+        /* ==================== ROLE CARDS ==================== */
         .role-selection {
             margin-bottom: 60px;
         }
@@ -155,7 +154,7 @@
             font-size: 0.9rem;
         }
 
-        /* Search Section */
+        /* ==================== SEARCH SECTION ==================== */
         .search-section {
             background: white;
             border-radius: 40px;
@@ -227,6 +226,7 @@
             align-items: center;
             gap: 10px;
             font-size: 1rem;
+            min-height: 50px;
         }
 
         .btn-search:hover {
@@ -234,13 +234,14 @@
             box-shadow: 0 10px 20px -5px rgba(37,99,235,0.4);
         }
 
-        /* Result Table */
+        /* ==================== RESULT TABLE ==================== */
         .result-container {
             margin-top: 20px;
             border-radius: 24px;
             overflow: hidden;
             border: 1px solid #e2e8f0;
             background: white;
+            max-width: 100%;
         }
 
         .result-header {
@@ -248,6 +249,24 @@
             color: white;
             padding: 15px 20px;
             font-weight: 600;
+        }
+
+        /* 🔥 WRAPPER UNTUK SCROLL HORIZONTAL */
+        .result-scroll {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            width: 100%;
+        }
+
+        .result-scroll::-webkit-scrollbar {
+            height: 8px;
+        }
+        .result-scroll::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        .result-scroll::-webkit-scrollbar-track {
+            background: #f1f5f9;
         }
 
         .result-table {
@@ -260,6 +279,7 @@
             padding: 14px 16px;
             text-align: left;
             border-bottom: 1px solid #e2e8f0;
+            white-space: nowrap;
         }
 
         .result-table th {
@@ -282,24 +302,38 @@
         }
 
         @keyframes fadeInDown {
-            from {
-                opacity: 0;
-                transform: translateY(-30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
+        /* ==================== MOBILE ==================== */
         @media (max-width: 768px) {
-            .container { padding: 20px; }
-            .header h1 { font-size: 1.5rem; }
-            .role-card { width: 100%; max-width: 280px; padding: 30px; }
-            .search-section { padding: 25px; }
-            .search-box { flex-direction: column; }
-            .btn-search { justify-content: center; padding: 12px; }
-            .result-table th, .result-table td { padding: 8px 10px; font-size: 0.75rem; }
+            .container { padding: 20px 15px; }
+            .header h1 { font-size: 1.3rem; }
+            .header .subtitle { font-size: 0.85rem; }
+            .role-card { width: 100%; max-width: 320px; padding: 30px 20px; }
+            .search-section { padding: 20px; border-radius: 24px; }
+            .search-box { flex-direction: column; gap: 10px; }
+            .btn-search { justify-content: center; padding: 14px; width: 100%; }
+            
+            /* Tabel tetap lebar & bisa digeser */
+            .result-table { min-width: 700px; }
+            .result-table th, 
+            .result-table td { 
+                padding: 10px 12px; 
+                font-size: 0.8rem; 
+            }
+            
+            /* Info geser */
+            .result-scroll::after {
+                content: '← geser untuk lihat kolom lain →';
+                display: block;
+                text-align: center;
+                font-size: 0.7rem;
+                color: #94a3b8;
+                padding: 6px;
+                background: #f8fafc;
+            }
         }
     </style>
 </head>
@@ -312,7 +346,7 @@
                 </div>
                 <h1>ASSESMENT TENGAH SEMESTER (ATS)</h1>
                 <h1>COMPUTER AND ANDROID BASED TEST (ABT)</h1>
-                 <h1>KELAS 6</h1>
+                <h1>KELAS 4</h1>
                 <div class="subtitle">SDN Gambirono 01 | Tahun Ajaran 2026/2027</div>
                 <div class="tanggal-info" id="tanggalDisplay"></div>
             </div>
@@ -335,7 +369,7 @@
                 </div>
             </div>
             
-            <!-- Fitur Pencarian Hasil Ujian -->
+            <!-- ==================== FITUR PENCARIAN ==================== -->
             <div class="search-section">
                 <h2><i class="fas fa-search" style="color:#3b82f6;"></i> Cek Hasil Ujian</h2>
                 <p class="subtitle">Masukkan USER dan pilih mata pelajaran untuk melihat nilai ujian Anda yang sudah <strong>Dikoreksi</strong></p>
@@ -360,13 +394,13 @@
                             <option value="Bahasa Jawa">Bahasa Jawa</option>
                         </select>
                     </div>
-                    <button class="btn-search" onclick="cariHasilUjian()"><i class="fas fa-chart-line"></i> Lihat Nilai</button>
+                    <button class="btn-search" onclick="cariHasilUjian()">
+                        <i class="fas fa-chart-line"></i> Lihat Nilai
+                    </button>
                 </div>
                 
                 <div id="resultContainer" class="result-container" style="display: none;">
-                    <div class="result-header">
-                        📋 Hasil Ujian
-                    </div>
+                    <div class="result-header">📋 Hasil Ujian</div>
                     <div id="resultContent">
                         <!-- Hasil pencarian akan ditampilkan di sini -->
                     </div>
@@ -399,111 +433,127 @@
             const tanggal = now.getDate();
             const bulan = getBulanIndonesia(now.getMonth());
             const tahun = now.getFullYear();
-            document.getElementById('tanggalDisplay').innerHTML = `<i class="far fa-calendar-alt"></i> ${hari}, ${tanggal} ${bulan} ${tahun}`;
+            document.getElementById('tanggalDisplay').innerHTML = 
+                `<i class="far fa-calendar-alt"></i> ${hari}, ${tanggal} ${bulan} ${tahun}`;
         }
         
         document.addEventListener('DOMContentLoaded', tampilkanTanggal);
         
-       async function cariHasilUjian() {
-    const nis = document.getElementById('searchNIS').value.trim();
-    const mapel = document.getElementById('searchMapel').value;
-    const resultContainer = document.getElementById('resultContainer');
-    const resultContent = document.getElementById('resultContent');
-    
-    if (!nis) { alert('❌ Silakan masukkan USER Anda!'); return; }
-    if (!mapel) { alert('❌ Silakan pilih mata pelajaran!'); return; }
-    
-    resultContainer.style.display = 'block';
-    resultContent.innerHTML = '<div class="loading-result"><i class="fas fa-spinner fa-pulse"></i> Sedang mencari data...</div>';
-    
-    try {
-        const siswaSnapshot = await firebase.firestore().collection('users').where('nis', '==', nis).get();
-        if (siswaSnapshot.empty) {
-            resultContent.innerHTML = '<div class="no-result">❌ Data siswa tidak ditemukan. Pastikan USER Anda benar.</div>';
-            return;
+        async function cariHasilUjian() {
+            const nis = document.getElementById('searchNIS').value.trim();
+            const mapel = document.getElementById('searchMapel').value;
+            const resultContainer = document.getElementById('resultContainer');
+            const resultContent = document.getElementById('resultContent');
+            
+            if (!nis) { alert('❌ Silakan masukkan USER Anda!'); return; }
+            if (!mapel) { alert('❌ Silakan pilih mata pelajaran!'); return; }
+            
+            resultContainer.style.display = 'block';
+            resultContent.innerHTML = '<div class="loading-result"><i class="fas fa-spinner fa-pulse"></i> Sedang mencari data...</div>';
+            
+            try {
+                // ========== CARI SISWA ==========
+                const siswaSnapshot = await firebase.firestore()
+                    .collection('users')
+                    .where('nis', '==', nis)
+                    .get();
+                
+                if (siswaSnapshot.empty) {
+                    resultContent.innerHTML = '<div class="no-result">❌ Data siswa tidak ditemukan. Pastikan USER Anda benar.</div>';
+                    return;
+                }
+                
+                const siswaDoc = siswaSnapshot.docs[0];
+                const siswa = siswaDoc.data();
+                const siswaId = siswaDoc.id;
+                
+                // ========== CARI JAWABAN ==========
+                const answersSnapshot = await firebase.firestore()
+                    .collection('answers')
+                    .where('siswaId', '==', siswaId)
+                    .where('mataPelajaran', '==', mapel)
+                    .get();
+                
+                if (answersSnapshot.empty) {
+                    resultContent.innerHTML = `<div class="no-result">📭 Belum ada nilai untuk ${mapel}.<br><small>Silakan kerjakan ujian terlebih dahulu.</small></div>`;
+                    return;
+                }
+                
+                // ========== FILTER YANG SUDAH DIKOREKSI ==========
+                let selesaiData = [];
+                answersSnapshot.forEach(doc => {
+                    const data = doc.data();
+                    if (data.statusKoreksi === 'selesai') {
+                        selesaiData.push({ id: doc.id, ...data });
+                    }
+                });
+                
+                if (selesaiData.length === 0) {
+                    resultContent.innerHTML = `<div class="no-result">📭 Nilai untuk ${mapel} belum dikoreksi oleh guru.<br><small>Silakan tunggu koreksi dari guru.</small></div>`;
+                    return;
+                }
+                
+                // ========== SORTING: AMBIL YANG TERBARU ==========
+                selesaiData.sort((a, b) => {
+                    const timeA = a.waktu?.toDate ? a.waktu.toDate() : new Date(0);
+                    const timeB = b.waktu?.toDate ? b.waktu.toDate() : new Date(0);
+                    return timeB - timeA;
+                });
+                
+                const data = selesaiData[0];
+                
+                // ========== BACA FIELD YANG BENAR (SESUAI DASHBOARD SISWA) ==========
+                const nilaiPG  = data.nilaiPG  || 0;
+                const nilaiPGK = data.nilaiPGK || 0;
+                const nilaiBS  = data.nilaiBS  || 0;
+                
+                const totalPG  = data.totalPG  || 0;
+                const totalPGK = data.totalPGK || 0;
+                const totalBS  = data.totalBS  || 0;
+                
+                // Nilai akhir: PAKAI YANG TERSIMPAN (konsisten dengan dashboard siswa)
+                const nilaiAkhir = data.nilaiAkhir || 0;
+                
+                // ========== RENDER TABEL ==========
+                let resultsHtml = `
+                    <div class="result-scroll">
+                        <table class="result-table">
+                            <thead>
+                                <tr>
+                                    <th>No</th>
+                                    <th>Nama Siswa</th>
+                                    <th>Kelas</th>
+                                    <th>Mata Pelajaran</th>
+                                    <th>PG</th>
+                                    <th>PGK</th>
+                                    <th>BS</th>
+                                    <th>Nilai Akhir</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>1</td>
+                                    <td><strong>${escapeHtml(data.siswaNama || siswa.nama || '-')}</strong></td>
+                                    <td>${escapeHtml(data.kelas || siswa.kelas || '-')}</td>
+                                    <td>${escapeHtml(data.mataPelajaran || mapel)}</td>
+                                    <td>${nilaiPG} / ${totalPG}</td>
+                                    <td>${nilaiPGK} / ${totalPGK}</td>
+                                    <td>${nilaiBS} / ${totalBS}</td>
+                                    <td class="${nilaiAkhir >= 70 ? 'nilai' : 'nilai-rendah'}">
+                                        ${nilaiAkhir} / 100
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+                resultContent.innerHTML = resultsHtml;
+                
+            } catch (error) {
+                console.error('Error:', error);
+                resultContent.innerHTML = `<div class="no-result">⚠️ Terjadi kesalahan: ${error.message}</div>`;
+            }
         }
-        
-        const siswaDoc = siswaSnapshot.docs[0];
-        const siswa = siswaDoc.data();
-        const siswaId = siswaDoc.id;
-        
-        const answersSnapshot = await firebase.firestore().collection('answers')
-            .where('siswaId', '==', siswaId)
-            .where('mataPelajaran', '==', mapel)
-            .get();
-        
-        if (answersSnapshot.empty) {
-            resultContent.innerHTML = `<div class="no-result">📭 Belum ada nilai untuk ${mapel}.<br><small>Silakan kerjakan ujian terlebih dahulu.</small></div>`;
-            return;
-        }
-        
-        let selesaiData = [];
-        answersSnapshot.forEach(doc => {
-            const data = doc.data();
-            if (data.statusKoreksi === 'selesai') selesaiData.push({ id: doc.id, ...data });
-        });
-        
-        if (selesaiData.length === 0) {
-            resultContent.innerHTML = `<div class="no-result">📭 Nilai untuk ${mapel} belum dikoreksi oleh guru.<br><small>Silakan tunggu koreksi dari guru.</small></div>`;
-            return;
-        }
-        
-        // Sorting pakai field 'waktu' (bukan 'waktuKoreksi')
-        selesaiData.sort((a, b) => {
-            let timeA = a.waktu?.toDate ? a.waktu.toDate() : new Date(0);
-            let timeB = b.waktu?.toDate ? b.waktu.toDate() : new Date(0);
-            return timeB - timeA;
-        });
-        
-        const data = selesaiData[0];
-        
-        // ========== BACA LANGSUNG DARI FIRESTORE (SESUAI DASHBOARD SISWA) ==========
-        const nilaiPG  = data.nilaiPG  || 0;
-        const nilaiPGK = data.nilaiPGK || 0;
-        const nilaiBS  = data.nilaiBS  || 0;
-        
-        const totalPG  = data.totalPG  || 0;
-        const totalPGK = data.totalPGK || 0;
-        const totalBS  = data.totalBS  || 0;
-        
-        // Nilai akhir: pakai yang sudah tersimpan (dihitung oleh dashboard-siswa.js)
-        const nilaiAkhir = data.nilaiAkhir || 0;
-        
-        let resultsHtml = `
-            <table class="result-table">
-                <thead>
-                    <tr>
-                        <th>No</th>
-                        <th>Nama Siswa</th>
-                        <th>Kelas</th>
-                        <th>Mata Pelajaran</th>
-                        <th>PG</th>
-                        <th>PGK</th>
-                        <th>BS</th>
-                        <th>Nilai Akhir</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>1</td>
-                        <td><strong>${escapeHtml(data.siswaNama || siswa.nama)}</strong></td>
-                        <td>${escapeHtml(data.kelas || siswa.kelas)}</td>
-                        <td>${escapeHtml(data.mataPelajaran)}</td>
-                        <td>${nilaiPG} / ${totalPG}</td>
-                        <td>${nilaiPGK} / ${totalPGK}</td>
-                        <td>${nilaiBS} / ${totalBS}</td>
-                        <td class="${nilaiAkhir >= 70 ? 'nilai' : 'nilai-rendah'}">
-                            ${nilaiAkhir} / 100
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        `;
-        resultContent.innerHTML = resultsHtml;
-    } catch (error) {
-        resultContent.innerHTML = `<div class="no-result">⚠️ Terjadi kesalahan: ${error.message}</div>`;
-    }
-}
         
         function escapeHtml(text) {
             if (!text) return '';
