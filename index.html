@@ -13,12 +13,18 @@
             box-sizing: border-box;
         }
 
+        html, body {
+            width: 100%;
+            min-height: 100vh;
+            /* ✅ TIDAK ADA overflow-x: hidden DI SINI */
+            /* ✅ Ini yang bikin tabel bisa di-scroll */
+        }
+
         body {
             font-family: 'Inter', sans-serif;
             background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 50%, #7dd3fc 100%);
-            min-height: 100vh;
             position: relative;
-            overflow-x: hidden;
+            overscroll-behavior-x: contain;
         }
 
         body::before {
@@ -31,6 +37,7 @@
             background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><path fill="rgba(255,255,255,0.1)" d="M100 0L200 100L100 200L0 100z"/><circle cx="100" cy="100" r="30" fill="rgba(255,255,255,0.05)"/></svg>');
             background-size: 60px;
             pointer-events: none;
+            z-index: 0;
         }
 
         .container {
@@ -162,6 +169,9 @@
             box-shadow: 0 25px 45px -12px rgba(0,0,0,0.15);
             backdrop-filter: blur(5px);
             border: 1px solid rgba(255,255,255,0.8);
+            /* ✅ JANGAN PAKAI overflow: hidden DI SINI */
+            overflow: visible;
+            max-width: 100%;
         }
 
         .search-section h2 {
@@ -217,13 +227,14 @@
             background: linear-gradient(135deg, #2563eb, #1e40af);
             color: white;
             border: none;
-            padding: 0 30px;
+            padding: 14px 30px;
             border-radius: 40px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s;
             display: flex;
             align-items: center;
+            justify-content: center;
             gap: 10px;
             font-size: 1rem;
             min-height: 50px;
@@ -238,10 +249,11 @@
         .result-container {
             margin-top: 20px;
             border-radius: 24px;
-            overflow: hidden;
             border: 1px solid #e2e8f0;
             background: white;
             max-width: 100%;
+            /* ✅ JANGAN overflow: hidden — biar scroll horizontal jalan */
+            overflow: visible;
         }
 
         .result-header {
@@ -249,29 +261,39 @@
             color: white;
             padding: 15px 20px;
             font-weight: 600;
+            border-radius: 24px 24px 0 0;
         }
 
-        /* 🔥 WRAPPER UNTUK SCROLL HORIZONTAL */
+        /* ✅ WRAPPER SCROLL — KUNCI UTAMA */
         .result-scroll {
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
             width: 100%;
+            max-width: 100%;
+            overflow-x: auto;
+            overflow-y: hidden;
+            -webkit-overflow-scrolling: touch;
+            touch-action: pan-x;             /* ✅ IZINKAN SWIPE HORIZONTAL */
+            display: block;
+            position: relative;
+            scrollbar-width: thin;
+            border-radius: 0 0 24px 24px;
         }
 
         .result-scroll::-webkit-scrollbar {
-            height: 8px;
+            height: 10px;
         }
         .result-scroll::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
-            border-radius: 4px;
+            background: #3b82f6;
+            border-radius: 6px;
         }
         .result-scroll::-webkit-scrollbar-track {
-            background: #f1f5f9;
+            background: #e2e8f0;
+            border-radius: 6px;
         }
 
         .result-table {
             width: 100%;
             border-collapse: collapse;
+            min-width: 750px;   /* ✅ Paksa lebar minimal */
         }
 
         .result-table th,
@@ -279,7 +301,7 @@
             padding: 14px 16px;
             text-align: left;
             border-bottom: 1px solid #e2e8f0;
-            white-space: nowrap;
+            white-space: nowrap;   /* ✅ Teks tidak lipat */
         }
 
         .result-table th {
@@ -297,7 +319,7 @@
 
         .no-result, .loading-result {
             text-align: center;
-            padding: 40px;
+            padding: 40px 20px;
             color: #64748b;
         }
 
@@ -308,32 +330,66 @@
 
         /* ==================== MOBILE ==================== */
         @media (max-width: 768px) {
-            .container { padding: 20px 15px; }
-            .header h1 { font-size: 1.3rem; }
-            .header .subtitle { font-size: 0.85rem; }
-            .role-card { width: 100%; max-width: 320px; padding: 30px 20px; }
-            .search-section { padding: 20px; border-radius: 24px; }
-            .search-box { flex-direction: column; gap: 10px; }
-            .btn-search { justify-content: center; padding: 14px; width: 100%; }
-            
-            /* Tabel tetap lebar & bisa digeser */
-            .result-table { min-width: 700px; }
-            .result-table th, 
-            .result-table td { 
-                padding: 10px 12px; 
-                font-size: 0.8rem; 
+            .container { 
+                padding: 20px 12px; 
+            }
+            .header h1 { 
+                font-size: 1.3rem; 
+            }
+            .header .subtitle { 
+                font-size: 0.85rem; 
+                letter-spacing: 1px;
+            }
+            .role-card { 
+                width: 100%; 
+                max-width: 320px; 
+                padding: 30px 20px; 
+            }
+            .search-section { 
+                padding: 20px 15px; 
+                border-radius: 24px; 
+            }
+            .search-box { 
+                flex-direction: column; 
+                gap: 10px; 
+            }
+            .btn-search { 
+                width: 100%; 
+                padding: 14px;
             }
             
-            /* Info geser */
+            /* ✅ Info cara geser */
             .result-scroll::after {
-                content: '← geser untuk lihat kolom lain →';
+                content: '👈 geser tabel untuk lihat kolom lain 👉';
                 display: block;
                 text-align: center;
                 font-size: 0.7rem;
-                color: #94a3b8;
-                padding: 6px;
-                background: #f8fafc;
+                color: #3b82f6;
+                padding: 8px;
+                background: #eff6ff;
+                font-weight: 600;
+                white-space: nowrap;
+                position: sticky;
+                left: 0;
+                width: 100vw;
+                max-width: 100%;
             }
+            
+            .result-table {
+                min-width: 750px;   /* ✅ TETAP LEBAR */
+            }
+            
+            .result-table th,
+            .result-table td {
+                padding: 10px 12px;
+                font-size: 0.8rem;
+            }
+        }
+
+        /* Untuk HP sangat kecil */
+        @media (max-width: 400px) {
+            .header h1 { font-size: 1.1rem; }
+            .search-section { padding: 15px 12px; }
         }
     </style>
 </head>
@@ -346,7 +402,7 @@
                 </div>
                 <h1>ASSESMENT TENGAH SEMESTER (ATS)</h1>
                 <h1>COMPUTER AND ANDROID BASED TEST (ABT)</h1>
-                <h1>KELAS 4</h1>
+                <h1>KELAS 6</h1>
                 <div class="subtitle">SDN Gambirono 01 | Tahun Ajaran 2026/2027</div>
                 <div class="tanggal-info" id="tanggalDisplay"></div>
             </div>
@@ -369,7 +425,7 @@
                 </div>
             </div>
             
-            <!-- ==================== FITUR PENCARIAN ==================== -->
+            <!-- ==================== PENCARIAN NILAI ==================== -->
             <div class="search-section">
                 <h2><i class="fas fa-search" style="color:#3b82f6;"></i> Cek Hasil Ujian</h2>
                 <p class="subtitle">Masukkan USER dan pilih mata pelajaran untuk melihat nilai ujian Anda yang sudah <strong>Dikoreksi</strong></p>
@@ -417,6 +473,7 @@
     <script src="js/firebase-config.js"></script>
     
     <script>
+        // ==================== TANGGAL ====================
         function getHariIndonesia(dayIndex) {
             const hari = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
             return hari[dayIndex];
@@ -439,6 +496,7 @@
         
         document.addEventListener('DOMContentLoaded', tampilkanTanggal);
         
+        // ==================== CARI HASIL UJIAN ====================
         async function cariHasilUjian() {
             const nis = document.getElementById('searchNIS').value.trim();
             const mapel = document.getElementById('searchMapel').value;
@@ -479,7 +537,7 @@
                     return;
                 }
                 
-                // ========== FILTER YANG SUDAH DIKOREKSI ==========
+                // ========== FILTER SUDAH DIKOREKSI ==========
                 let selesaiData = [];
                 answersSnapshot.forEach(doc => {
                     const data = doc.data();
@@ -493,7 +551,7 @@
                     return;
                 }
                 
-                // ========== SORTING: AMBIL YANG TERBARU ==========
+                // ========== SORTING: AMBIL TERBARU ==========
                 selesaiData.sort((a, b) => {
                     const timeA = a.waktu?.toDate ? a.waktu.toDate() : new Date(0);
                     const timeB = b.waktu?.toDate ? b.waktu.toDate() : new Date(0);
@@ -502,7 +560,7 @@
                 
                 const data = selesaiData[0];
                 
-                // ========== BACA FIELD YANG BENAR (SESUAI DASHBOARD SISWA) ==========
+                // ========== BACA FIELD YANG BENAR ==========
                 const nilaiPG  = data.nilaiPG  || 0;
                 const nilaiPGK = data.nilaiPGK || 0;
                 const nilaiBS  = data.nilaiBS  || 0;
@@ -511,7 +569,6 @@
                 const totalPGK = data.totalPGK || 0;
                 const totalBS  = data.totalBS  || 0;
                 
-                // Nilai akhir: PAKAI YANG TERSIMPAN (konsisten dengan dashboard siswa)
                 const nilaiAkhir = data.nilaiAkhir || 0;
                 
                 // ========== RENDER TABEL ==========
