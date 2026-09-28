@@ -1,7 +1,12 @@
 // ============================================================
-// dashboard-siswa.js - REBUILD 2025
+// dashboard-siswa.js - REBUILD 2025 (REVISI FINAL)
 // 3 Jenis Soal: PG, PGK (PG Kompleks), BS (Benar/Salah)
+// Rumus Nilai Akhir (CARA A):
+//   ((nilaiPG + nilaiPGK + nilaiBS) / (totalPG + totalPGK + totalBS)) x 100
 // ============================================================
+
+// ==================== KONFIGURASI (SAMAKAN DENGAN management-nilai.js) ====================
+const POIN_PER_SOAL = 5; // Nilai maksimal per soal untuk semua tipe
 
 const currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
 let currentExam = null;
@@ -121,13 +126,9 @@ async function startExam(examId, subjectName) {
             return;
         }
         
-        const nilaiSetting = currentExam.nilaiPerSoal || { pg: 5, pgk: 5, bs: 5 };
+        // Semua soal pakai POIN_PER_SOAL (samakan dengan management-nilai.js)
         currentQuestions = currentQuestions.map(q => {
-            if (!q.nilai) {
-                if (q.tipe === 'pg') q.nilai = nilaiSetting.pg;
-                else if (q.tipe === 'pgk') q.nilai = nilaiSetting.pgk;
-                else if (q.tipe === 'bs') q.nilai = nilaiSetting.bs;
-            }
+            q.nilai = POIN_PER_SOAL;
             return q;
         });
         
@@ -382,7 +383,7 @@ function selectTrueFalse(questionId, pernyataanIndex, jawaban) {
     updateQuestionGrid();
 }
 
-// ==================== NAVIGASI (FIXED) ====================
+// ==================== NAVIGASI ====================
 function goToQuestion(index) {
     if (index >= 0 && index < currentQuestions.length) {
         currentQuestionIndex = index;
@@ -437,25 +438,14 @@ function updateQuestionGrid() {
     grid.innerHTML = html;
 }
 
-// ==================== SUBMIT EXAM (AUTO KOREKSI) ====================
+// ==================== SUBMIT EXAM (CARA A) ====================
 async function submitExam() {
     if (!confirm('Apakah Anda yakin ingin mengumpulkan jawaban?')) return;
     
     if (timerInterval) clearInterval(timerInterval);
     
     try {
-        const examDoc = await examsRef.doc(currentExam.id).get();
-        if (!examDoc.exists) {
-            alert('Data ujian tidak ditemukan');
-            return;
-        }
-        const examData = examDoc.data();
-        
-        const POIN_PER_SOAL = 5;
-        const nilaiPGPerSoal = examData.nilaiPerSoal?.pg || POIN_PER_SOAL;
-        const nilaiPGKPerSoal = examData.nilaiPerSoal?.pgk || POIN_PER_SOAL;
-        const nilaiBSPerSoal = examData.nilaiPerSoal?.bs || POIN_PER_SOAL;
-        
+        // ========== SIAPKAN PENAMPUNG ==========
         const jawabanPG = {};
         const jawabanPGK = {};
         const jawabanBS = {};
@@ -464,16 +454,18 @@ async function submitExam() {
         let jmlPG = 0, jmlPGK = 0, jmlBS = 0;
         const detailKoreksi = { pg: {}, pgk: {}, bs: {} };
         
+        // ========== LOOP SEMUA SOAL ==========
         for (const question of currentQuestions) {
             const jawabanSiswa = currentAnswers[question.id];
             const tipe = question.tipe;
             
+            // ---------- KOREKSI PG ----------
             if (tipe === 'pg') {
                 jmlPG++;
                 const jawabanStr = String(jawabanSiswa || '').trim().toUpperCase();
                 const kunciStr = String(question.kunci || '').trim().toUpperCase();
                 const benar = (jawabanStr !== '' && jawabanStr === kunciStr);
-                const nilai = benar ? nilaiPGPerSoal : 0;
+                const nilai = benar ? POIN_PER_SOAL : 0;
                 nilaiPG += nilai;
                 
                 jawabanPG[question.id] = {
@@ -491,9 +483,11 @@ async function submitExam() {
                     kunci: kunciStr,
                     benar: benar,
                     nilai: nilai,
-                    nilaiMaksimal: nilaiPGPerSoal
+                    nilaiMaksimal: POIN_PER_SOAL
                 };
             }
+            
+            // ---------- KOREKSI PGK ----------
             else if (tipe === 'pgk') {
                 jmlPGK++;
                 const jawabanArr = Array.isArray(jawabanSiswa) ? jawabanSiswa : [];
@@ -503,7 +497,7 @@ async function submitExam() {
                         ? question.kunci.split(',').map(k => k.trim().toUpperCase()).filter(Boolean)
                         : []);
                 
-                const nilai = hitungNilaiPGK(jawabanArr, kunciArr, nilaiPGKPerSoal);
+                const nilai = hitungNilaiPGK(jawabanArr, kunciArr);
                 nilaiPGK += nilai;
                 
                 jawabanPGK[question.id] = {
@@ -519,9 +513,11 @@ async function submitExam() {
                     jawaban: jawabanArr,
                     kunci: kunciArr,
                     nilai: nilai,
-                    nilaiMaksimal: nilaiPGKPerSoal
+                    nilaiMaksimal: POIN_PER_SOAL
                 };
             }
+            
+            // ---------- KOREKSI BS ----------
             else if (tipe === 'bs') {
                 jmlBS++;
                 const jawabanObj = jawabanSiswa || {};
@@ -531,9 +527,9 @@ async function submitExam() {
                 const detailBS = [];
                 
                 pernyataanList.forEach((item, idx) => {
-                    const jawabanItem = jawabanObj[idx] || '';
+                    const jawabanItem = (jawabanObj[idx] || '').toUpperCase();
                     const kunciItem = (item.kunci || item.jawaban || '').toUpperCase();
-                    const isBenar = (jawabanItem === kunciItem && jawabanItem !== '');
+                    const isBenar = (jawabanItem !== '' && jawabanItem === kunciItem);
                     if (isBenar) benar++;
                     
                     detailBS.push({
@@ -544,17 +540,14 @@ async function submitExam() {
                     });
                 });
                 
-                const totalPernyataan = pernyataanList.length;
-                const nilai = totalPernyataan > 0 
-                    ? (benar / totalPernyataan) * nilaiBSPerSoal 
-                    : 0;
+                const nilai = hitungNilaiBS(jawabanObj, pernyataanList);
                 nilaiBS += nilai;
                 
                 jawabanBS[question.id] = {
                     jawaban: jawabanObj,
                     pernyataan: pernyataanList,
                     benar: benar,
-                    total: totalPernyataan,
+                    total: pernyataanList.length,
                     nilai: nilai,
                     nomor: question.nomor,
                     soal: question.soal
@@ -564,25 +557,27 @@ async function submitExam() {
                     jawaban: jawabanObj,
                     pernyataan: detailBS,
                     benar: benar,
-                    totalPernyataan: totalPernyataan,
+                    totalPernyataan: pernyataanList.length,
                     nilai: nilai,
-                    nilaiMaksimal: nilaiBSPerSoal
+                    nilaiMaksimal: POIN_PER_SOAL
                 };
             }
         }
         
-        const totalPG = jmlPG * nilaiPGPerSoal;
-        const totalPGK = jmlPGK * nilaiPGKPerSoal;
-        const totalBS = jmlBS * nilaiBSPerSoal;
+        // ========== HITUNG TOTAL (CARA A) ==========
+        const totalPG  = jmlPG  * POIN_PER_SOAL;
+        const totalPGK = jmlPGK * POIN_PER_SOAL;
+        const totalBS  = jmlBS  * POIN_PER_SOAL;
         
         const jumlahNilaiDiperoleh = nilaiPG + nilaiPGK + nilaiBS;
-        const jumlahNilaiMaksimal = totalPG + totalPGK + totalBS;
+        const jumlahNilaiMaksimal  = totalPG + totalPGK + totalBS;
         
         let nilaiAkhir = 0;
         if (jumlahNilaiMaksimal > 0) {
             nilaiAkhir = Math.round((jumlahNilaiDiperoleh / jumlahNilaiMaksimal) * 100);
         }
         
+        // ========== SIMPAN KE FIRESTORE ==========
         await answersRef.add({
             examId: currentExam.id,
             siswaId: currentUser.id,
@@ -618,40 +613,72 @@ async function submitExam() {
     }
 }
 
-// ==================== HITUNG NILAI PGK ====================
-function hitungNilaiPGK(jawabanArr, kunciArr, nilaiMaks) {
+// ==================== HITUNG NILAI PGK (SAMAKAN DENGAN MANAGEMENT) ====================
+function hitungNilaiPGK(jawabanArr, kunciArr) {
     if (!jawabanArr || jawabanArr.length === 0) return 0;
     if (!kunciArr || kunciArr.length === 0) return 0;
     
-    const jawaban = jawabanArr.map(j => String(j).toUpperCase().trim()).filter(Boolean);
-    const kunci = kunciArr.map(k => String(k).toUpperCase().trim()).filter(Boolean);
+    const parseArr = (arr) => {
+        return arr
+            .map(s => String(s).toUpperCase().trim())
+            .filter(s => s.length > 0)
+            .sort();
+    };
+    
+    const arrJawaban = Array.isArray(jawabanArr) ? parseArr(jawabanArr) : [];
+    const arrKunci = Array.isArray(kunciArr) ? parseArr(kunciArr) : [];
+    
+    if (arrKunci.length === 0) return 0;
+    if (arrJawaban.length === 0) return 0;
     
     let B = 0;
     let S = 0;
     
-    for (const j of jawaban) {
-        if (kunci.includes(j)) {
+    for (const j of arrJawaban) {
+        if (arrKunci.includes(j)) {
             B++;
         } else {
             S++;
         }
     }
     
-    const K = kunci.length;
+    const K = arrKunci.length;
     
-    if (B === K && S === 0 && jawaban.length === K) {
-        return nilaiMaks;
+    // Persis sama (full benar)
+    if (B === K && S === 0) {
+        return POIN_PER_SOAL; // 5
     }
     
+    // Ada jawaban salah (campuran benar & salah)
     if (S >= 1 && B >= 1) {
         return 1;
     }
     
+    // Kurang (tidak salah, tapi tidak lengkap)
     if (B >= 1 && S === 0 && B < K) {
-        return nilaiMaks / 2;
+        return POIN_PER_SOAL / 2; // 2.5
     }
     
+    // Benar 0
     return 0;
+}
+
+// ==================== HITUNG NILAI BS (SAMAKAN DENGAN MANAGEMENT) ====================
+function hitungNilaiBS(jawabanObj, pernyataanList) {
+    if (!jawabanObj || !pernyataanList || pernyataanList.length === 0) return 0;
+    
+    let benar = 0;
+    const total = pernyataanList.length;
+    
+    pernyataanList.forEach((item, idx) => {
+        const jawabanItem = (jawabanObj[idx] || '').toUpperCase();
+        const kunciItem = (item.kunci || item.jawaban || '').toUpperCase();
+        if (jawabanItem !== '' && jawabanItem === kunciItem) {
+            benar++;
+        }
+    });
+    
+    return (benar / total) * POIN_PER_SOAL;
 }
 
 // ==================== SHOW RESULTS ====================
