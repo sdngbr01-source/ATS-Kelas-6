@@ -404,83 +404,106 @@
         
         document.addEventListener('DOMContentLoaded', tampilkanTanggal);
         
-        async function cariHasilUjian() {
-            const nis = document.getElementById('searchNIS').value.trim();
-            const mapel = document.getElementById('searchMapel').value;
-            const resultContainer = document.getElementById('resultContainer');
-            const resultContent = document.getElementById('resultContent');
-            
-            if (!nis) { alert('❌ Silakan masukkan USER Anda!'); return; }
-            if (!mapel) { alert('❌ Silakan pilih mata pelajaran!'); return; }
-            
-            resultContainer.style.display = 'block';
-            resultContent.innerHTML = '<div class="loading-result"><i class="fas fa-spinner fa-pulse"></i> Sedang mencari data...</div>';
-            
-            try {
-                const siswaSnapshot = await firebase.firestore().collection('users').where('nis', '==', nis).get();
-                if (siswaSnapshot.empty) {
-                    resultContent.innerHTML = '<div class="no-result">❌ Data siswa tidak ditemukan. Pastikan USER Anda benar.</div>';
-                    return;
-                }
-                
-                const siswaDoc = siswaSnapshot.docs[0];
-                const siswa = siswaDoc.data();
-                const siswaId = siswaDoc.id;
-                
-                const answersSnapshot = await firebase.firestore().collection('answers')
-                    .where('siswaId', '==', siswaId)
-                    .where('mataPelajaran', '==', mapel)
-                    .get();
-                
-                if (answersSnapshot.empty) {
-                    resultContent.innerHTML = `<div class="no-result">📭 Belum ada nilai untuk ${mapel}.<br><small>Silakan kerjakan ujian terlebih dahulu.</small></div>`;
-                    return;
-                }
-                
-                let selesaiData = [];
-                answersSnapshot.forEach(doc => {
-                    const data = doc.data();
-                    if (data.statusKoreksi === 'selesai') selesaiData.push({ id: doc.id, ...data });
-                });
-                
-                if (selesaiData.length === 0) {
-                    resultContent.innerHTML = `<div class="no-result">📭 Nilai untuk ${mapel} belum dikoreksi oleh guru.<br><small>Silakan tunggu koreksi dari guru.</small></div>`;
-                    return;
-                }
-                
-                selesaiData.sort((a, b) => {
-                    let timeA = a.waktuKoreksi?.toDate ? a.waktuKoreksi.toDate() : new Date(0);
-                    let timeB = b.waktuKoreksi?.toDate ? b.waktuKoreksi.toDate() : new Date(0);
-                    return timeB - timeA;
-                });
-                
-                const data = selesaiData[0];
-                let nilaiPG = data.nilaiPG || 0;
-                let nilaiIsian = data.nilaiIsian || 0;
-                let nilaiUraian = data.nilaiUraian || 0;
-                let totalPG = data.totalPG || 1;
-                let totalIsian = data.totalIsian || 1;
-                let totalUraian = data.totalUraian || 1;
-                
-                let totalNilai = nilaiPG + nilaiIsian + nilaiUraian;
-                let maxNilai = totalPG + totalIsian + totalUraian;
-                let nilaiAkhir = maxNilai > 0 ? Math.round((totalNilai / maxNilai) * 100) : 0;
-                
-                let resultsHtml = `
-                    <table class="result-table">
-                        <thead>
-                            <tr><th>No</th><th>Nama Siswa</th><th>Kelas</th><th>Mata Pelajaran</th><th>Nilai PG</th><th>Nilai Isian</th><th>Nilai Uraian</th><th>Nilai Akhir</th></tr>
-                        </thead>
-                        <tbody>
-                            <tr><td>1</td><td><strong>${escapeHtml(data.siswaNama || siswa.nama)}</strong></td><td>${escapeHtml(data.kelas || siswa.kelas)}</td><td>${escapeHtml(data.mataPelajaran)}</td><td>${nilaiPG}</td><td>${nilaiIsian}</td><td>${nilaiUraian}</td><td class="${nilaiAkhir >= 70 ? 'nilai' : 'nilai-rendah'}">${nilaiAkhir} / 100</td></tr>
-                        </tbody>
-                    </table>
-                `;
-                resultContent.innerHTML = resultsHtml;
-            } catch (error) {
-                resultContent.innerHTML = `<div class="no-result">⚠️ Terjadi kesalahan: ${error.message}</div>`;
-            }
+       async function cariHasilUjian() {
+    const nis = document.getElementById('searchNIS').value.trim();
+    const mapel = document.getElementById('searchMapel').value;
+    const resultContainer = document.getElementById('resultContainer');
+    const resultContent = document.getElementById('resultContent');
+    
+    if (!nis) { alert('❌ Silakan masukkan USER Anda!'); return; }
+    if (!mapel) { alert('❌ Silakan pilih mata pelajaran!'); return; }
+    
+    resultContainer.style.display = 'block';
+    resultContent.innerHTML = '<div class="loading-result"><i class="fas fa-spinner fa-pulse"></i> Sedang mencari data...</div>';
+    
+    try {
+        const siswaSnapshot = await firebase.firestore().collection('users').where('nis', '==', nis).get();
+        if (siswaSnapshot.empty) {
+            resultContent.innerHTML = '<div class="no-result">❌ Data siswa tidak ditemukan. Pastikan USER Anda benar.</div>';
+            return;
         }
+        
+        const siswaDoc = siswaSnapshot.docs[0];
+        const siswa = siswaDoc.data();
+        const siswaId = siswaDoc.id;
+        
+        const answersSnapshot = await firebase.firestore().collection('answers')
+            .where('siswaId', '==', siswaId)
+            .where('mataPelajaran', '==', mapel)
+            .get();
+        
+        if (answersSnapshot.empty) {
+            resultContent.innerHTML = `<div class="no-result">📭 Belum ada nilai untuk ${mapel}.<br><small>Silakan kerjakan ujian terlebih dahulu.</small></div>`;
+            return;
+        }
+        
+        let selesaiData = [];
+        answersSnapshot.forEach(doc => {
+            const data = doc.data();
+            if (data.statusKoreksi === 'selesai') selesaiData.push({ id: doc.id, ...data });
+        });
+        
+        if (selesaiData.length === 0) {
+            resultContent.innerHTML = `<div class="no-result">📭 Nilai untuk ${mapel} belum dikoreksi oleh guru.<br><small>Silakan tunggu koreksi dari guru.</small></div>`;
+            return;
+        }
+        
+        // Sorting pakai field 'waktu' (bukan 'waktuKoreksi')
+        selesaiData.sort((a, b) => {
+            let timeA = a.waktu?.toDate ? a.waktu.toDate() : new Date(0);
+            let timeB = b.waktu?.toDate ? b.waktu.toDate() : new Date(0);
+            return timeB - timeA;
+        });
+        
+        const data = selesaiData[0];
+        
+        // ========== BACA LANGSUNG DARI FIRESTORE (SESUAI DASHBOARD SISWA) ==========
+        const nilaiPG  = data.nilaiPG  || 0;
+        const nilaiPGK = data.nilaiPGK || 0;
+        const nilaiBS  = data.nilaiBS  || 0;
+        
+        const totalPG  = data.totalPG  || 0;
+        const totalPGK = data.totalPGK || 0;
+        const totalBS  = data.totalBS  || 0;
+        
+        // Nilai akhir: pakai yang sudah tersimpan (dihitung oleh dashboard-siswa.js)
+        const nilaiAkhir = data.nilaiAkhir || 0;
+        
+        let resultsHtml = `
+            <table class="result-table">
+                <thead>
+                    <tr>
+                        <th>No</th>
+                        <th>Nama Siswa</th>
+                        <th>Kelas</th>
+                        <th>Mata Pelajaran</th>
+                        <th>PG</th>
+                        <th>PGK</th>
+                        <th>BS</th>
+                        <th>Nilai Akhir</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td><strong>${escapeHtml(data.siswaNama || siswa.nama)}</strong></td>
+                        <td>${escapeHtml(data.kelas || siswa.kelas)}</td>
+                        <td>${escapeHtml(data.mataPelajaran)}</td>
+                        <td>${nilaiPG} / ${totalPG}</td>
+                        <td>${nilaiPGK} / ${totalPGK}</td>
+                        <td>${nilaiBS} / ${totalBS}</td>
+                        <td class="${nilaiAkhir >= 70 ? 'nilai' : 'nilai-rendah'}">
+                            ${nilaiAkhir} / 100
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        `;
+        resultContent.innerHTML = resultsHtml;
+    } catch (error) {
+        resultContent.innerHTML = `<div class="no-result">⚠️ Terjadi kesalahan: ${error.message}</div>`;
+    }
+}
         
         function escapeHtml(text) {
             if (!text) return '';
