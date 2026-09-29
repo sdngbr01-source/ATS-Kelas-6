@@ -16,8 +16,6 @@
         html, body {
             width: 100%;
             min-height: 100vh;
-            /* ✅ TIDAK ADA overflow-x: hidden DI SINI */
-            /* ✅ Ini yang bikin tabel bisa di-scroll */
         }
 
         body {
@@ -169,7 +167,6 @@
             box-shadow: 0 25px 45px -12px rgba(0,0,0,0.15);
             backdrop-filter: blur(5px);
             border: 1px solid rgba(255,255,255,0.8);
-            /* ✅ JANGAN PAKAI overflow: hidden DI SINI */
             overflow: visible;
             max-width: 100%;
         }
@@ -252,7 +249,6 @@
             border: 1px solid #e2e8f0;
             background: white;
             max-width: 100%;
-            /* ✅ JANGAN overflow: hidden — biar scroll horizontal jalan */
             overflow: visible;
         }
 
@@ -264,14 +260,13 @@
             border-radius: 24px 24px 0 0;
         }
 
-        /* ✅ WRAPPER SCROLL — KUNCI UTAMA */
         .result-scroll {
             width: 100%;
             max-width: 100%;
             overflow-x: auto;
             overflow-y: hidden;
             -webkit-overflow-scrolling: touch;
-            touch-action: pan-x;             /* ✅ IZINKAN SWIPE HORIZONTAL */
+            touch-action: pan-x;
             display: block;
             position: relative;
             scrollbar-width: thin;
@@ -293,7 +288,7 @@
         .result-table {
             width: 100%;
             border-collapse: collapse;
-            min-width: 750px;   /* ✅ Paksa lebar minimal */
+            min-width: 750px;
         }
 
         .result-table th,
@@ -301,7 +296,7 @@
             padding: 14px 16px;
             text-align: left;
             border-bottom: 1px solid #e2e8f0;
-            white-space: nowrap;   /* ✅ Teks tidak lipat */
+            white-space: nowrap;
         }
 
         .result-table th {
@@ -321,6 +316,30 @@
             text-align: center;
             padding: 40px 20px;
             color: #64748b;
+        }
+
+        /* ✅ Info total nilai */
+        .total-info {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            padding: 15px 20px;
+            background: #f0f9ff;
+            border-top: 1px solid #e2e8f0;
+            border-radius: 0 0 24px 24px;
+            font-size: 0.9rem;
+            justify-content: center;
+        }
+        .total-info .badge {
+            background: white;
+            padding: 8px 20px;
+            border-radius: 30px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+            font-weight: 600;
+            color: #1e293b;
+        }
+        .total-info .badge span {
+            color: #3b82f6;
         }
 
         @keyframes fadeInDown {
@@ -358,7 +377,6 @@
                 padding: 14px;
             }
             
-            /* ✅ Info cara geser */
             .result-scroll::after {
                 content: '👈 geser tabel untuk lihat kolom lain 👉';
                 display: block;
@@ -376,7 +394,7 @@
             }
             
             .result-table {
-                min-width: 750px;   /* ✅ TETAP LEBAR */
+                min-width: 750px;
             }
             
             .result-table th,
@@ -386,7 +404,6 @@
             }
         }
 
-        /* Untuk HP sangat kecil */
         @media (max-width: 400px) {
             .header h1 { font-size: 1.1rem; }
             .search-section { padding: 15px 12px; }
@@ -428,30 +445,14 @@
             <!-- ==================== PENCARIAN NILAI ==================== -->
             <div class="search-section">
                 <h2><i class="fas fa-search" style="color:#3b82f6;"></i> Cek Hasil Ujian</h2>
-                <p class="subtitle">Masukkan USER dan pilih mata pelajaran untuk melihat nilai ujian Anda yang sudah <strong>Dikoreksi</strong></p>
+                <p class="subtitle">Masukkan <strong>NISN</strong> untuk melihat <strong>semua nilai</strong> dari mata pelajaran yang sudah <strong>Dikoreksi</strong></p>
                 
                 <div class="search-box">
                     <div class="search-input-group">
-                        <input type="text" id="searchNIS" placeholder="📋 Masukkan USER / NIS" autocomplete="off">
-                    </div>
-                    <div class="search-input-group">
-                        <select id="searchMapel">
-                            <option value="">📖 Pilih Mata Pelajaran</option>
-                            <option value="Pendidikan Pancasila">Pendidikan Pancasila</option>
-                            <option value="Pendidikan Agama Islam">Pendidikan Agama Islam</option>
-                            <option value="Matematika">Matematika</option>
-                            <option value="Bahasa Indonesia">Bahasa Indonesia</option>
-                            <option value="IPAS">IPAS</option>
-                            <option value="IPS">IPS</option>
-                            <option value="PPKn">PPKn</option>
-                            <option value="PJOK">PJOK</option>
-                            <option value="SBdP">SBdP</option>
-                            <option value="Bahasa inggris">Bahasa Inggris</option>
-                            <option value="Bahasa Jawa">Bahasa Jawa</option>
-                        </select>
+                        <input type="text" id="searchNIS" placeholder="📋 Masukkan NISN" autocomplete="off">
                     </div>
                     <button class="btn-search" onclick="cariHasilUjian()">
-                        <i class="fas fa-chart-line"></i> Lihat Nilai
+                        <i class="fas fa-chart-line"></i> Lihat Semua Nilai
                     </button>
                 </div>
                 
@@ -496,15 +497,13 @@
         
         document.addEventListener('DOMContentLoaded', tampilkanTanggal);
         
-        // ==================== CARI HASIL UJIAN ====================
+        // ==================== CARI HASIL UJIAN (SEMUA MAPEL) ====================
         async function cariHasilUjian() {
             const nis = document.getElementById('searchNIS').value.trim();
-            const mapel = document.getElementById('searchMapel').value;
             const resultContainer = document.getElementById('resultContainer');
             const resultContent = document.getElementById('resultContent');
             
-            if (!nis) { alert('❌ Silakan masukkan USER Anda!'); return; }
-            if (!mapel) { alert('❌ Silakan pilih mata pelajaran!'); return; }
+            if (!nis) { alert('❌ Silakan masukkan NISN Anda!'); return; }
             
             resultContainer.style.display = 'block';
             resultContent.innerHTML = '<div class="loading-result"><i class="fas fa-spinner fa-pulse"></i> Sedang mencari data...</div>';
@@ -517,7 +516,7 @@
                     .get();
                 
                 if (siswaSnapshot.empty) {
-                    resultContent.innerHTML = '<div class="no-result">❌ Data siswa tidak ditemukan. Pastikan USER Anda benar.</div>';
+                    resultContent.innerHTML = '<div class="no-result">❌ Data siswa tidak ditemukan. Pastikan NISN Anda benar.</div>';
                     return;
                 }
                 
@@ -525,15 +524,14 @@
                 const siswa = siswaDoc.data();
                 const siswaId = siswaDoc.id;
                 
-                // ========== CARI JAWABAN ==========
+                // ========== CARI SEMUA JAWABAN SISWA ==========
                 const answersSnapshot = await firebase.firestore()
                     .collection('answers')
                     .where('siswaId', '==', siswaId)
-                    .where('mataPelajaran', '==', mapel)
                     .get();
                 
                 if (answersSnapshot.empty) {
-                    resultContent.innerHTML = `<div class="no-result">📭 Belum ada nilai untuk ${mapel}.<br><small>Silakan kerjakan ujian terlebih dahulu.</small></div>`;
+                    resultContent.innerHTML = `<div class="no-result">📭 Belum ada nilai untuk siswa ini.<br><small>Silakan kerjakan ujian terlebih dahulu.</small></div>`;
                     return;
                 }
                 
@@ -547,31 +545,83 @@
                 });
                 
                 if (selesaiData.length === 0) {
-                    resultContent.innerHTML = `<div class="no-result">📭 Nilai untuk ${mapel} belum dikoreksi oleh guru.<br><small>Silakan tunggu koreksi dari guru.</small></div>`;
+                    resultContent.innerHTML = `<div class="no-result">📭 Nilai belum dikoreksi oleh guru.<br><small>Silakan tunggu koreksi dari guru.</small></div>`;
                     return;
                 }
                 
-                // ========== SORTING: AMBIL TERBARU ==========
-                selesaiData.sort((a, b) => {
-                    const timeA = a.waktu?.toDate ? a.waktu.toDate() : new Date(0);
-                    const timeB = b.waktu?.toDate ? b.waktu.toDate() : new Date(0);
-                    return timeB - timeA;
+                // ========== KELOMPOKKAN PER MATA PELAJARAN (AMBIL TERBARU) ==========
+                const mapelMap = {};
+                selesaiData.forEach(item => {
+                    const mapel = item.mataPelajaran || 'Tanpa Mapel';
+                    const time = item.waktu?.toDate ? item.waktu.toDate() : new Date(0);
+                    if (!mapelMap[mapel] || time > mapelMap[mapel]._time) {
+                        mapelMap[mapel] = { ...item, _time: time };
+                    }
                 });
                 
-                const data = selesaiData[0];
+                // ========== URUTKAN MAPEL ==========
+                const urutanMapel = [
+                    'Pendidikan Pancasila',
+                    'Pendidikan Agama Islam',
+                    'Matematika',
+                    'Bahasa Indonesia',
+                    'IPAS',
+                    'IPS',
+                    'PPKn',
+                    'PJOK',
+                    'SBdP',
+                    'Bahasa inggris',
+                    'Bahasa Jawa'
+                ];
                 
-                // ========== BACA FIELD YANG BENAR ==========
-                const nilaiPG  = data.nilaiPG  || 0;
-                const nilaiPGK = data.nilaiPGK || 0;
-                const nilaiBS  = data.nilaiBS  || 0;
+                const mapelList = Object.keys(mapelMap).sort((a, b) => {
+                    const idxA = urutanMapel.indexOf(a);
+                    const idxB = urutanMapel.indexOf(b);
+                    if (idxA === -1 && idxB === -1) return a.localeCompare(b);
+                    if (idxA === -1) return 1;
+                    if (idxB === -1) return -1;
+                    return idxA - idxB;
+                });
                 
-                const totalPG  = data.totalPG  || 0;
-                const totalPGK = data.totalPGK || 0;
-                const totalBS  = data.totalBS  || 0;
-                
-                const nilaiAkhir = data.nilaiAkhir || 0;
+                // ========== HITUNG RATA-RATA ==========
+                let totalNilai = 0;
+                let jumlahMapel = 0;
                 
                 // ========== RENDER TABEL ==========
+                let rowsHtml = '';
+                mapelList.forEach((mapel, index) => {
+                    const data = mapelMap[mapel];
+                    const nilaiPG  = data.nilaiPG  || 0;
+                    const nilaiPGK = data.nilaiPGK || 0;
+                    const nilaiBS  = data.nilaiBS  || 0;
+                    
+                    const totalPG  = data.totalPG  || 0;
+                    const totalPGK = data.totalPGK || 0;
+                    const totalBS  = data.totalBS  || 0;
+                    
+                    const nilaiAkhir = data.nilaiAkhir || 0;
+                    
+                    totalNilai += nilaiAkhir;
+                    jumlahMapel++;
+                    
+                    rowsHtml += `
+                        <tr>
+                            <td>${index + 1}</td>
+                            <td><strong>${escapeHtml(data.siswaNama || siswa.nama || '-')}</strong></td>
+                            <td>${escapeHtml(data.kelas || siswa.kelas || '-')}</td>
+                            <td>${escapeHtml(mapel)}</td>
+                            <td>${nilaiPG} / ${totalPG}</td>
+                            <td>${nilaiPGK} / ${totalPGK}</td>
+                            <td>${nilaiBS} / ${totalBS}</td>
+                            <td class="${nilaiAkhir >= 70 ? 'nilai' : 'nilai-rendah'}">
+                                ${nilaiAkhir} / 100
+                            </td>
+                        </tr>
+                    `;
+                });
+                
+                const rataRata = jumlahMapel > 0 ? Math.round(totalNilai / jumlahMapel) : 0;
+                
                 let resultsHtml = `
                     <div class="result-scroll">
                         <table class="result-table">
@@ -588,20 +638,15 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td>1</td>
-                                    <td><strong>${escapeHtml(data.siswaNama || siswa.nama || '-')}</strong></td>
-                                    <td>${escapeHtml(data.kelas || siswa.kelas || '-')}</td>
-                                    <td>${escapeHtml(data.mataPelajaran || mapel)}</td>
-                                    <td>${nilaiPG} / ${totalPG}</td>
-                                    <td>${nilaiPGK} / ${totalPGK}</td>
-                                    <td>${nilaiBS} / ${totalBS}</td>
-                                    <td class="${nilaiAkhir >= 70 ? 'nilai' : 'nilai-rendah'}">
-                                        ${nilaiAkhir} / 100
-                                    </td>
-                                </tr>
+                                ${rowsHtml}
                             </tbody>
                         </table>
+                    </div>
+                    <div class="total-info">
+                        <div class="badge">📊 Total Mapel: <span>${jumlahMapel}</span></div>
+                        <div class="badge">📈 Rata-rata: <span>${rataRata}</span></div>
+                        <div class="badge">🏆 Nilai Tertinggi: <span>${Math.max(...mapelList.map(m => mapelMap[m].nilaiAkhir || 0))}</span></div>
+                        <div class="badge">📉 Nilai Terendah: <span>${Math.min(...mapelList.map(m => mapelMap[m].nilaiAkhir || 0))}</span></div>
                     </div>
                 `;
                 resultContent.innerHTML = resultsHtml;
