@@ -1,10 +1,14 @@
 // pdf-setting.js
 // Generate Rapor PDF - 1 File = 1 Kelas (1 Halaman = 1 Siswa)
 // Default KOP: SDN Gambirono 01 - Jember
+// REBUILD 2025 - Filter Mapel "Uji Coba" & Pakai NilaiFinal
 
 // ==================== KONSTANTA ====================
 const PDF_SETTING_KEY = 'pdf_header_setting';
 const KKM_DEFAULT = 70;
+
+// ✅ Mapel yang tidak ditampilkan di rapor
+const MAPEL_DIKECUALIKAN = ['Uji Coba'];
 
 // ==================== DEFAULT KOP ====================
 const DEFAULT_KOP = {
@@ -368,15 +372,27 @@ async function generateLembarJawaban() {
             .where('kelas', '==', kelas)
             .get();
         
+        // ============================================================
         // 3. Group jawaban by siswaId + mapel (ambil terbaru)
+        //    ✅ FILTER 1: Skip mapel yang dikecualikan ("Uji Coba")
+        //    ✅ FILTER 2: Skip statusKoreksi yang bukan 'selesai'
+        // ============================================================
         const nilaiMap = new Map();
         semuaJawabanSnapshot.forEach(doc => {
             const data = doc.data();
             if (!data.siswaId || !data.mataPelajaran) return;
+            
+            // ✅ FILTER 1: Skip mapel yang dikecualikan
+            if (MAPEL_DIKECUALIKAN.includes(data.mataPelajaran)) return;
+            
+            // ✅ FILTER 2: Skip kalau belum selesai dikoreksi
+            if (data.statusKoreksi && data.statusKoreksi !== 'selesai') return;
+            
             const key = `${data.siswaId}__${data.mataPelajaran}`;
             const currentWaktu = getWaktuValue(data);
             const existing = nilaiMap.get(key);
             const existingWaktu = existing ? getWaktuValue(existing) : null;
+            
             if (!nilaiMap.has(key) ||
                 (currentWaktu && existingWaktu && currentWaktu > existingWaktu) ||
                 (currentWaktu && !existingWaktu)) {
@@ -400,20 +416,39 @@ async function generateLembarJawaban() {
             console.warn('Gagal ambil wali kelas:', e);
         }
         
+        // ============================================================
         // 5. Susun data per siswa
+        //    ✅ FILTER: Double-check mapel dikecualikan
+        //    ✅ Gunakan nilaiFinal (hasil remidial/pengayaan)
+        // ============================================================
         const siswaList = [];
         siswaSnapshot.forEach(doc => {
             const siswa = { id: doc.id, ...doc.data() };
             const nilaiPerMapel = [];
+            
             nilaiMap.forEach((nilai) => {
                 if (nilai.siswaId === siswa.id) {
+                    // ✅ Double-check: skip mapel yang dikecualikan
+                    if (MAPEL_DIKECUALIKAN.includes(nilai.mataPelajaran)) return;
+                    
+                    // ✅ Pakai nilaiFinal kalau ada (hasil remidial/pengayaan yang sudah diproses)
+                    const nilaiFinal = (nilai.nilaiFinal !== undefined && nilai.nilaiFinal !== null)
+                        ? nilai.nilaiFinal
+                        : (nilai.nilaiAkhir || 0);
+                    
                     nilaiPerMapel.push({
                         mapel: nilai.mataPelajaran,
-                        nilaiAkhir: Math.round(nilai.nilaiAkhir || 0)
+                        nilaiAkhir: Math.round(nilaiFinal),
+                        nilaiMentah: Math.round(nilai.nilaiAkhir || 0),
+                        kategori: nilai.kategori || 'utama',
+                        kode: nilai.kode || 'ATS1'
                     });
                 }
             });
+            
+            // Sort per mapel A-Z
             nilaiPerMapel.sort((a, b) => a.mapel.localeCompare(b.mapel, 'id', { sensitivity: 'base' }));
+            
             siswaList.push({ ...siswa, nilaiPerMapel, waliKelas: waliKelasNama });
         });
         
@@ -765,6 +800,5 @@ if (typeof window !== 'undefined') {
     window.loadPdfSetting = loadPdfSetting;
     window.resetPdfSetting = resetPdfSetting;
     window.generateLembarJawaban = generateLembarJawaban;
-    window.downloadLaporanKelas = downloadLaporanKelas;
     window.updatePdfPreview = updatePdfPreview;
 }
