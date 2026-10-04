@@ -3,20 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>ATS - SDN Gambirono 01</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <title>Sistem Asessment - SDN Gambirono 01</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
-        html, body {
-            width: 100%;
-            min-height: 100vh;
-        }
+        html, body { width: 100%; min-height: 100vh; }
 
         body {
             font-family: 'Inter', sans-serif;
@@ -28,10 +21,8 @@
         body::before {
             content: '';
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
             background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><path fill="rgba(255,255,255,0.1)" d="M100 0L200 100L100 200L0 100z"/><circle cx="100" cy="100" r="30" fill="rgba(255,255,255,0.05)"/></svg>');
             background-size: 60px;
             pointer-events: none;
@@ -63,8 +54,7 @@
         }
 
         .logo-img {
-            width: 100px;
-            height: 100px;
+            width: 100px; height: 100px;
             object-fit: cover;
             border-radius: 50%;
             background: #f8fafc;
@@ -100,9 +90,7 @@
         }
 
         /* ==================== ROLE CARDS ==================== */
-        .role-selection {
-            margin-bottom: 60px;
-        }
+        .role-selection { margin-bottom: 60px; }
 
         .role-selection h2 {
             text-align: center;
@@ -154,10 +142,7 @@
             margin-bottom: 10px;
         }
 
-        .role-card p {
-            color: #475569;
-            font-size: 0.9rem;
-        }
+        .role-card p { color: #475569; font-size: 0.9rem; }
 
         /* ==================== SEARCH SECTION ==================== */
         .search-section {
@@ -200,8 +185,7 @@
             min-width: 200px;
         }
 
-        .search-input-group input,
-        .search-input-group select {
+        .search-input-group input {
             width: 100%;
             padding: 14px 18px;
             border: 2px solid #e2e8f0;
@@ -212,8 +196,7 @@
             font-family: 'Inter', sans-serif;
         }
 
-        .search-input-group input:focus,
-        .search-input-group select:focus {
+        .search-input-group input:focus {
             outline: none;
             border-color: #3b82f6;
             box-shadow: 0 0 0 3px rgba(59,130,246,0.2);
@@ -242,6 +225,83 @@
             box-shadow: 0 10px 20px -5px rgba(37,99,235,0.4);
         }
 
+        /* ==================== SUMMARY CARDS ==================== */
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .summary-card {
+            background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+            border-radius: 20px;
+            padding: 18px 20px;
+            text-align: center;
+            border: 1px solid #e2e8f0;
+            transition: all 0.3s;
+        }
+
+        .summary-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+        }
+
+        .summary-card .value {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: #1e293b;
+            line-height: 1.2;
+        }
+
+        .summary-card .label {
+            font-size: 0.75rem;
+            color: #64748b;
+            font-weight: 600;
+            margin-top: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .summary-card.highlight {
+            background: linear-gradient(135deg, #2563eb, #1e40af);
+            border-color: transparent;
+        }
+
+        .summary-card.highlight .value,
+        .summary-card.highlight .label { color: white; }
+
+        .summary-card.success .value { color: #10b981; }
+        .summary-card.danger .value { color: #ef4444; }
+        .summary-card.warning .value { color: #f59e0b; }
+
+        /* ==================== FILTER ROW ==================== */
+        .filter-row {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+            align-items: center;
+        }
+
+        .filter-row select {
+            padding: 10px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 16px;
+            background: white;
+            font-size: 0.85rem;
+            font-family: 'Inter', sans-serif;
+            cursor: pointer;
+            transition: all 0.3s;
+            min-width: 180px;
+        }
+
+        .filter-row select:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59,130,246,0.1);
+        }
+
         /* ==================== RESULT TABLE ==================== */
         .result-container {
             margin-top: 20px;
@@ -258,13 +318,28 @@
             padding: 15px 20px;
             font-weight: 600;
             border-radius: 24px 24px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .result-header .siswa-info {
+            font-size: 0.85rem;
+            color: rgba(255,255,255,0.85);
+            font-weight: 400;
+        }
+
+        .result-header .siswa-info strong {
+            color: white;
+            font-weight: 700;
         }
 
         .result-scroll {
             width: 100%;
             max-width: 100%;
             overflow-x: auto;
-            overflow-y: hidden;
             -webkit-overflow-scrolling: touch;
             touch-action: pan-x;
             display: block;
@@ -273,9 +348,7 @@
             border-radius: 0 0 24px 24px;
         }
 
-        .result-scroll::-webkit-scrollbar {
-            height: 10px;
-        }
+        .result-scroll::-webkit-scrollbar { height: 10px; }
         .result-scroll::-webkit-scrollbar-thumb {
             background: #3b82f6;
             border-radius: 6px;
@@ -288,7 +361,7 @@
         .result-table {
             width: 100%;
             border-collapse: collapse;
-            min-width: 750px;
+            min-width: 1050px;
         }
 
         .result-table th,
@@ -303,14 +376,39 @@
             background: #f1f5f9;
             font-weight: 600;
             color: #1e293b;
+            font-size: 0.85rem;
+            position: sticky;
+            top: 0;
+            z-index: 2;
         }
 
-        .result-table tr:hover {
-            background: #f8fafc;
+        .result-table tr:hover { background: #f8fafc; }
+
+        .result-table td { font-size: 0.85rem; }
+
+        /* ==================== BADGES ==================== */
+        .badge-kode {
+            display: inline-block;
+            background: linear-gradient(135deg, #1e40af, #3b82f6);
+            color: white;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
         }
 
-        .nilai { color: #10b981; font-weight: bold; }
-        .nilai-rendah { color: #ef4444; font-weight: bold; }
+        .badge-nilai {
+            display: inline-block;
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 0.85rem;
+        }
+
+        .badge-nilai.high { background: #dcfce7; color: #166534; }
+        .badge-nilai.mid { background: #fef3c7; color: #92400e; }
+        .badge-nilai.low { background: #fee2e2; color: #991b1b; }
 
         .no-result, .loading-result {
             text-align: center;
@@ -318,29 +416,9 @@
             color: #64748b;
         }
 
-        /* ✅ Info total nilai */
-        .total-info {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 15px;
-            padding: 15px 20px;
-            background: #f0f9ff;
-            border-top: 1px solid #e2e8f0;
-            border-radius: 0 0 24px 24px;
-            font-size: 0.9rem;
-            justify-content: center;
-        }
-        .total-info .badge {
-            background: white;
-            padding: 8px 20px;
-            border-radius: 30px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.06);
-            font-weight: 600;
-            color: #1e293b;
-        }
-        .total-info .badge span {
-            color: #3b82f6;
-        }
+        .no-result small { color: #94a3b8; }
+
+        .loading-result i { color: #3b82f6; font-size: 1.5rem; }
 
         @keyframes fadeInDown {
             from { opacity: 0; transform: translateY(-30px); }
@@ -349,34 +427,25 @@
 
         /* ==================== MOBILE ==================== */
         @media (max-width: 768px) {
-            .container { 
-                padding: 20px 12px; 
+            .container { padding: 20px 12px; }
+            .header h1 { font-size: 1.3rem; }
+            .header .subtitle { font-size: 0.85rem; letter-spacing: 1px; }
+            .role-card { width: 100%; max-width: 320px; padding: 30px 20px; }
+            .search-section { padding: 20px 15px; border-radius: 24px; }
+            .search-box { flex-direction: column; gap: 10px; }
+            .btn-search { width: 100%; padding: 14px; }
+
+            .summary-cards {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
             }
-            .header h1 { 
-                font-size: 1.3rem; 
-            }
-            .header .subtitle { 
-                font-size: 0.85rem; 
-                letter-spacing: 1px;
-            }
-            .role-card { 
-                width: 100%; 
-                max-width: 320px; 
-                padding: 30px 20px; 
-            }
-            .search-section { 
-                padding: 20px 15px; 
-                border-radius: 24px; 
-            }
-            .search-box { 
-                flex-direction: column; 
-                gap: 10px; 
-            }
-            .btn-search { 
-                width: 100%; 
-                padding: 14px;
-            }
-            
+            .summary-card { padding: 14px; }
+            .summary-card .value { font-size: 1.4rem; }
+            .summary-card .label { font-size: 0.65rem; }
+
+            .filter-row { flex-direction: column; align-items: stretch; }
+            .filter-row select { width: 100%; }
+
             .result-scroll::after {
                 content: '👈 geser tabel untuk lihat kolom lain 👉';
                 display: block;
@@ -392,16 +461,10 @@
                 width: 100vw;
                 max-width: 100%;
             }
-            
-            .result-table {
-                min-width: 750px;
-            }
-            
+
+            .result-table { min-width: 1050px; }
             .result-table th,
-            .result-table td {
-                padding: 10px 12px;
-                font-size: 0.8rem;
-            }
+            .result-table td { padding: 10px 12px; font-size: 0.75rem; }
         }
 
         @media (max-width: 400px) {
@@ -417,13 +480,13 @@
                 <div class="logo-wrapper">
                     <img src="logo.png" alt="Logo" class="logo-img" onerror="this.src='https://placehold.co/100x100?text=Logo'">
                 </div>
-                <h1>ASSESMENT TENGAH SEMESTER (ATS)</h1>
+                <h1>SISTEM ASESSMENT TERINTEGRASI</h1>
                 <h1>COMPUTER AND ANDROID BASED TEST (ABT)</h1>
                 <h1>KELAS 6</h1>
                 <div class="subtitle">SDN Gambirono 01 | Tahun Ajaran 2026/2027</div>
                 <div class="tanggal-info" id="tanggalDisplay"></div>
             </div>
-            
+
             <div class="role-selection">
                 <h2><i class="fas fa-users" style="margin-right: 12px; color:#3b82f6;"></i> Login Sebagai</h2>
                 <div class="role-cards">
@@ -441,12 +504,12 @@
                     </div>
                 </div>
             </div>
-            
+
             <!-- ==================== PENCARIAN NILAI ==================== -->
             <div class="search-section">
                 <h2><i class="fas fa-search" style="color:#3b82f6;"></i> Cek Hasil Ujian</h2>
                 <p class="subtitle">Masukkan <strong>NISN</strong> untuk melihat <strong>semua nilai</strong> dari mata pelajaran yang sudah <strong>Dikoreksi</strong></p>
-                
+
                 <div class="search-box">
                     <div class="search-input-group">
                         <input type="text" id="searchNIS" placeholder="📋 Masukkan NISN" autocomplete="off">
@@ -455,9 +518,12 @@
                         <i class="fas fa-chart-line"></i> Lihat Semua Nilai
                     </button>
                 </div>
-                
+
                 <div id="resultContainer" class="result-container" style="display: none;">
-                    <div class="result-header">📋 Hasil Ujian</div>
+                    <div class="result-header">
+                        <span>📋 Hasil Ujian</span>
+                        <span class="siswa-info" id="resultSiswaInfo"></span>
+                    </div>
                     <div id="resultContent">
                         <!-- Hasil pencarian akan ditampilkan di sini -->
                     </div>
@@ -465,205 +531,402 @@
             </div>
         </div>
     </div>
-    
+
     <!-- 🔥 FIREBASE LIBRARIES -->
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
-    
+
     <script src="js/firebase-config.js"></script>
-    
+
     <script>
+        // ==================== KONSTANTA KODE ====================
+        const KODE_LABEL = {
+            'UH1': 'UH 1', 'UH2': 'UH 2', 'UH3': 'UH 3', 'UH4': 'UH 4',
+            'UH5': 'UH 5', 'UH6': 'UH 6', 'UH7': 'UH 7', 'UH8': 'UH 8',
+            'ATS1': 'ATS Ganjil',
+            'ASAS': 'ASAS Sem 1',
+            'ATS2': 'ATS Genap',
+            'ASAT': 'ASAT Sem 2',
+            'ASAJ': 'ASAJ'
+        };
+
+        const KODE_URUTAN = {
+            'UH1': 1, 'UH2': 2, 'UH3': 3, 'UH4': 4,
+            'UH5': 5, 'UH6': 6, 'UH7': 7, 'UH8': 8,
+            'ATS1': 10, 'ASAS': 11, 'ATS2': 12, 'ASAT': 13, 'ASAJ': 14
+        };
+
+        const URUTAN_MAPEL = [
+            'Pendidikan Pancasila',
+            'Pendidikan Agama Islam',
+            'Matematika',
+            'Bahasa Indonesia',
+            'IPAS',
+            'IPS',
+            'PPKn',
+            'PJOK',
+            'SBdP',
+            'Bahasa inggris',
+            'Bahasa Jawa',
+            'Baca Tulis Alquran'
+        ];
+
+        // Mapel yang tidak ditampilkan di hasil ujian
+        const MAPEL_DIKECUALIKAN = ['Uji Coba'];
+
         // ==================== TANGGAL ====================
         function getHariIndonesia(dayIndex) {
             const hari = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
             return hari[dayIndex];
         }
-        
+
         function getBulanIndonesia(monthIndex) {
             const bulan = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
             return bulan[monthIndex];
         }
-        
+
         function tampilkanTanggal() {
             const now = new Date();
             const hari = getHariIndonesia(now.getDay());
             const tanggal = now.getDate();
             const bulan = getBulanIndonesia(now.getMonth());
             const tahun = now.getFullYear();
-            document.getElementById('tanggalDisplay').innerHTML = 
+            document.getElementById('tanggalDisplay').innerHTML =
                 `<i class="far fa-calendar-alt"></i> ${hari}, ${tanggal} ${bulan} ${tahun}`;
         }
-        
+
         document.addEventListener('DOMContentLoaded', tampilkanTanggal);
-        
-        // ==================== CARI HASIL UJIAN (SEMUA MAPEL) ====================
+
+        // ==================== CARI HASIL UJIAN ====================
         async function cariHasilUjian() {
             const nis = document.getElementById('searchNIS').value.trim();
             const resultContainer = document.getElementById('resultContainer');
             const resultContent = document.getElementById('resultContent');
-            
-            if (!nis) { alert('❌ Silakan masukkan NISN Anda!'); return; }
-            
+            const siswaInfo = document.getElementById('resultSiswaInfo');
+
+            if (!nis) {
+                alert('❌ Silakan masukkan NISN Anda!');
+                return;
+            }
+
             resultContainer.style.display = 'block';
             resultContent.innerHTML = '<div class="loading-result"><i class="fas fa-spinner fa-pulse"></i> Sedang mencari data...</div>';
-            
+            siswaInfo.textContent = '';
+
             try {
                 // ========== CARI SISWA ==========
                 const siswaSnapshot = await firebase.firestore()
                     .collection('users')
                     .where('nis', '==', nis)
                     .get();
-                
+
                 if (siswaSnapshot.empty) {
                     resultContent.innerHTML = '<div class="no-result">❌ Data siswa tidak ditemukan. Pastikan NISN Anda benar.</div>';
                     return;
                 }
-                
+
                 const siswaDoc = siswaSnapshot.docs[0];
                 const siswa = siswaDoc.data();
                 const siswaId = siswaDoc.id;
-                
+
+                // Tampilkan info siswa di header
+                siswaInfo.innerHTML = `<strong>${escapeHtml(siswa.nama || '-')}</strong> · Kelas ${escapeHtml(siswa.kelas || '-')} · NIS: ${escapeHtml(siswa.nis || '-')}`;
+
                 // ========== CARI SEMUA JAWABAN SISWA ==========
                 const answersSnapshot = await firebase.firestore()
                     .collection('answers')
                     .where('siswaId', '==', siswaId)
                     .get();
-                
+
                 if (answersSnapshot.empty) {
-                    resultContent.innerHTML = `<div class="no-result">📭 Belum ada nilai untuk siswa ini.<br><small>Silakan kerjakan ujian terlebih dahulu.</small></div>`;
+                    resultContent.innerHTML = '<div class="no-result">📭 Belum ada nilai untuk siswa ini.<br><small>Silakan kerjakan ujian terlebih dahulu.</small></div>';
                     return;
                 }
-                
-                // ========== FILTER SUDAH DIKOREKSI ==========
+
+                // ========== FILTER SUDAH DIKOREKSI + EXCLUDE UJI COBA ==========
                 let selesaiData = [];
                 answersSnapshot.forEach(doc => {
                     const data = doc.data();
-                    if (data.statusKoreksi === 'selesai') {
-                        selesaiData.push({ id: doc.id, ...data });
-                    }
+                    if (data.statusKoreksi !== 'selesai') return;
+
+                    // ✅ Kecualikan mapel "Uji Coba"
+                    const mapel = data.mataPelajaran || '';
+                    if (MAPEL_DIKECUALIKAN.includes(mapel)) return;
+
+                    selesaiData.push({ id: doc.id, ...data });
                 });
-                
+
                 if (selesaiData.length === 0) {
-                    resultContent.innerHTML = `<div class="no-result">📭 Nilai belum dikoreksi oleh guru.<br><small>Silakan tunggu koreksi dari guru.</small></div>`;
+                    resultContent.innerHTML = '<div class="no-result">📭 Nilai belum dikoreksi oleh guru.<br><small>Silakan tunggu koreksi dari guru.</small></div>';
                     return;
                 }
-                
-                // ========== KELOMPOKKAN PER MATA PELAJARAN (AMBIL TERBARU) ==========
+
+                // ========== KELOMPOKKAN PER MAPEL + KODE ==========
+                // ✅ Remidial & pengayaan sudah diproses → nilaiFinal yang dipakai
+                // ✅ Satu mapel + kode = 1 baris (nilai yang sudah final)
                 const mapelMap = {};
                 selesaiData.forEach(item => {
                     const mapel = item.mataPelajaran || 'Tanpa Mapel';
+                    const kode = item.kode || 'ATS1';
+                    const key = `${mapel}__${kode}`;
                     const time = item.waktu?.toDate ? item.waktu.toDate() : new Date(0);
-                    if (!mapelMap[mapel] || time > mapelMap[mapel]._time) {
-                        mapelMap[mapel] = { ...item, _time: time };
+
+                    // Ambil yang terbaru (yang sudah final setelah remidial/pengayaan)
+                    if (!mapelMap[key] || time > mapelMap[key]._time) {
+                        mapelMap[key] = {
+                            ...item,
+                            _time: time,
+                            _mapel: mapel,
+                            _kode: kode
+                        };
                     }
                 });
-                
-                // ========== URUTKAN MAPEL ==========
-                const urutanMapel = [
-                    'Pendidikan Pancasila',
-                    'Pendidikan Agama Islam',
-                    'Matematika',
-                    'Bahasa Indonesia',
-                    'IPAS',
-                    'IPS',
-                    'PPKn',
-                    'PJOK',
-                    'SBdP',
-                    'Bahasa inggris',
-                    'Bahasa Jawa'
-                ];
-                
-                const mapelList = Object.keys(mapelMap).sort((a, b) => {
-                    const idxA = urutanMapel.indexOf(a);
-                    const idxB = urutanMapel.indexOf(b);
-                    if (idxA === -1 && idxB === -1) return a.localeCompare(b);
-                    if (idxA === -1) return 1;
-                    if (idxB === -1) return -1;
-                    return idxA - idxB;
+
+                // ========== URUTKAN ==========
+                const listKeys = Object.keys(mapelMap).sort((a, b) => {
+                    const A = mapelMap[a], B = mapelMap[b];
+                    const idxA = URUTAN_MAPEL.indexOf(A._mapel);
+                    const idxB = URUTAN_MAPEL.indexOf(B._mapel);
+                    if (idxA !== idxB) {
+                        if (idxA === -1) return 1;
+                        if (idxB === -1) return -1;
+                        return idxA - idxB;
+                    }
+                    const kA = KODE_URUTAN[A._kode] || 99;
+                    const kB = KODE_URUTAN[B._kode] || 99;
+                    return kA - kB;
                 });
-                
-                // ========== HITUNG RATA-RATA ==========
-                let totalNilai = 0;
-                let jumlahMapel = 0;
-                
-                // ========== RENDER TABEL ==========
+
+                // ========== RENDER ==========
                 let rowsHtml = '';
-                mapelList.forEach((mapel, index) => {
-                    const data = mapelMap[mapel];
+                let totalNilai = 0;
+                let jumlahData = 0;
+                let nilaiTertinggi = 0;
+                let nilaiTerendah = 100;
+                let jumlahTuntas = 0;
+                const mapelUnik = new Set();
+
+                listKeys.forEach((key, index) => {
+                    const data = mapelMap[key];
                     const nilaiPG  = data.nilaiPG  || 0;
                     const nilaiPGK = data.nilaiPGK || 0;
                     const nilaiBS  = data.nilaiBS  || 0;
-                    
+
                     const totalPG  = data.totalPG  || 0;
                     const totalPGK = data.totalPGK || 0;
                     const totalBS  = data.totalBS  || 0;
-                    
-                    const nilaiAkhir = data.nilaiAkhir || 0;
-                    
+
+                    // ✅ Gunakan nilaiFinal (hasil remidial/pengayaan yang sudah diproses)
+                    const nilaiAkhir = (data.nilaiFinal !== undefined && data.nilaiFinal !== null)
+                        ? data.nilaiFinal
+                        : (data.nilaiAkhir || 0);
+
+                    // Format tanggal
+                    const tanggal = data.waktu?.toDate
+                        ? data.waktu.toDate().toLocaleDateString('id-ID', {
+                            day: '2-digit', month: 'short', year: 'numeric'
+                          })
+                        : '-';
+
+                    // Badge kelas nilai
+                    let nilaiClass = 'mid';
+                    if (nilaiAkhir >= 70) nilaiClass = 'high';
+                    else if (nilaiAkhir < 60) nilaiClass = 'low';
+
+                    // Statistik
                     totalNilai += nilaiAkhir;
-                    jumlahMapel++;
-                    
+                    jumlahData++;
+                    if (nilaiAkhir > nilaiTertinggi) nilaiTertinggi = nilaiAkhir;
+                    if (nilaiAkhir < nilaiTerendah) nilaiTerendah = nilaiAkhir;
+                    if (nilaiAkhir >= 70) jumlahTuntas++;
+                    mapelUnik.add(data._mapel);
+
                     rowsHtml += `
                         <tr>
                             <td>${index + 1}</td>
-                            <td><strong>${escapeHtml(data.siswaNama || siswa.nama || '-')}</strong></td>
-                            <td>${escapeHtml(data.kelas || siswa.kelas || '-')}</td>
-                            <td>${escapeHtml(mapel)}</td>
+                            <td><strong>${escapeHtml(data._mapel)}</strong></td>
+                            <td><span class="badge-kode">${KODE_LABEL[data._kode] || data._kode}</span></td>
                             <td>${nilaiPG} / ${totalPG}</td>
                             <td>${nilaiPGK} / ${totalPGK}</td>
                             <td>${nilaiBS} / ${totalBS}</td>
-                            <td class="${nilaiAkhir >= 70 ? 'nilai' : 'nilai-rendah'}">
-                                ${nilaiAkhir} / 100
-                            </td>
+                            <td><span class="badge-nilai ${nilaiClass}">${nilaiAkhir}</span></td>
+                            <td style="font-size:12px;color:#64748b;">${tanggal}</td>
                         </tr>
                     `;
                 });
-                
-                const rataRata = jumlahMapel > 0 ? Math.round(totalNilai / jumlahMapel) : 0;
-                
-                let resultsHtml = `
+
+                const rataRata = jumlahData > 0 ? Math.round(totalNilai / jumlahData) : 0;
+                if (jumlahData === 0) nilaiTerendah = 0;
+
+                // ========== SUMMARY CARDS ==========
+                const summaryHtml = `
+                    <div class="summary-cards">
+                        <div class="summary-card highlight">
+                            <div class="value">${jumlahData}</div>
+                            <div class="label">Total Ujian</div>
+                        </div>
+                        <div class="summary-card">
+                            <div class="value">${mapelUnik.size}</div>
+                            <div class="label">Mata Pelajaran</div>
+                        </div>
+                        <div class="summary-card success">
+                            <div class="value">${rataRata}</div>
+                            <div class="label">Rata-rata</div>
+                        </div>
+                        <div class="summary-card success">
+                            <div class="value">${nilaiTertinggi}</div>
+                            <div class="label">Tertinggi</div>
+                        </div>
+                        <div class="summary-card danger">
+                            <div class="value">${nilaiTerendah}</div>
+                            <div class="label">Terendah</div>
+                        </div>
+                        <div class="summary-card warning">
+                            <div class="value">${jumlahTuntas}/${jumlahData}</div>
+                            <div class="label">Tuntas (≥70)</div>
+                        </div>
+                    </div>
+                `;
+
+                // ========== FILTER MAPEL & KODE ==========
+                const mapelOptions = Array.from(mapelUnik)
+                    .sort((a, b) => {
+                        const ia = URUTAN_MAPEL.indexOf(a);
+                        const ib = URUTAN_MAPEL.indexOf(b);
+                        if (ia === -1 && ib === -1) return a.localeCompare(b);
+                        if (ia === -1) return 1;
+                        if (ib === -1) return -1;
+                        return ia - ib;
+                    })
+                    .map(m => `<option value="${escapeHtml(m)}">${escapeHtml(m)}</option>`)
+                    .join('');
+
+                // Kode yang muncul saja di filter
+                const kodeUnik = new Set(listKeys.map(k => mapelMap[k]._kode));
+                const kodeOptions = Object.keys(KODE_LABEL)
+                    .filter(k => kodeUnik.has(k))
+                    .sort((a, b) => (KODE_URUTAN[a] || 99) - (KODE_URUTAN[b] || 99))
+                    .map(k => `<option value="${k}">${KODE_LABEL[k]}</option>`)
+                    .join('');
+
+                const filterHtml = `
+                    <div class="filter-row">
+                        <select id="filterMapelHasil" onchange="filterTabelHasil()">
+                            <option value="">📚 Semua Mata Pelajaran</option>
+                            ${mapelOptions}
+                        </select>
+                        <select id="filterKodeHasil" onchange="filterTabelHasil()">
+                            <option value="">📝 Semua Kode Ujian</option>
+                            ${kodeOptions}
+                        </select>
+                    </div>
+                `;
+
+                // ========== TABEL ==========
+                const tableHtml = `
                     <div class="result-scroll">
                         <table class="result-table">
                             <thead>
                                 <tr>
                                     <th>No</th>
-                                    <th>Nama Siswa</th>
-                                    <th>Kelas</th>
                                     <th>Mata Pelajaran</th>
+                                    <th>Kode Ujian</th>
                                     <th>PG</th>
                                     <th>PGK</th>
                                     <th>BS</th>
                                     <th>Nilai Akhir</th>
+                                    <th>Tanggal</th>
                                 </tr>
                             </thead>
-                            <tbody>
+                            <tbody id="tabelHasilBody">
                                 ${rowsHtml}
                             </tbody>
                         </table>
                     </div>
-                    <div class="total-info">
-                        <div class="badge">📊 Total Mapel: <span>${jumlahMapel}</span></div>
-                        <div class="badge">📈 Rata-rata: <span>${rataRata}</span></div>
-                        <div class="badge">🏆 Nilai Tertinggi: <span>${Math.max(...mapelList.map(m => mapelMap[m].nilaiAkhir || 0))}</span></div>
-                        <div class="badge">📉 Nilai Terendah: <span>${Math.min(...mapelList.map(m => mapelMap[m].nilaiAkhir || 0))}</span></div>
-                    </div>
                 `;
-                resultContent.innerHTML = resultsHtml;
-                
+
+                resultContent.innerHTML = summaryHtml + filterHtml + tableHtml;
+
+                // Simpan data untuk filter
+                window._hasilData = listKeys.map((key, index) => {
+                    const data = mapelMap[key];
+                    const nilaiAkhir = (data.nilaiFinal !== undefined && data.nilaiFinal !== null)
+                        ? data.nilaiFinal
+                        : (data.nilaiAkhir || 0);
+                    return {
+                        index: index + 1,
+                        mapel: data._mapel,
+                        kode: data._kode,
+                        nilaiPG: data.nilaiPG || 0,
+                        nilaiPGK: data.nilaiPGK || 0,
+                        nilaiBS: data.nilaiBS || 0,
+                        totalPG: data.totalPG || 0,
+                        totalPGK: data.totalPGK || 0,
+                        totalBS: data.totalBS || 0,
+                        nilaiAkhir: nilaiAkhir,
+                        tanggal: data.waktu?.toDate
+                            ? data.waktu.toDate().toLocaleDateString('id-ID', {
+                                day: '2-digit', month: 'short', year: 'numeric'
+                              })
+                            : '-'
+                    };
+                });
+
             } catch (error) {
                 console.error('Error:', error);
                 resultContent.innerHTML = `<div class="no-result">⚠️ Terjadi kesalahan: ${error.message}</div>`;
             }
         }
-        
+
+        // ==================== FILTER TABEL ====================
+        function filterTabelHasil() {
+            const filterMapel = document.getElementById('filterMapelHasil')?.value || '';
+            const filterKode = document.getElementById('filterKodeHasil')?.value || '';
+            const tbody = document.getElementById('tabelHasilBody');
+
+            if (!tbody || !window._hasilData) return;
+
+            let filtered = window._hasilData;
+            if (filterMapel) filtered = filtered.filter(d => d.mapel === filterMapel);
+            if (filterKode) filtered = filtered.filter(d => d.kode === filterKode);
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;color:#64748b;padding:30px;">📭 Tidak ada data sesuai filter</td></tr>';
+                return;
+            }
+
+            let html = '';
+            filtered.forEach((d, i) => {
+                let nilaiClass = 'mid';
+                if (d.nilaiAkhir >= 70) nilaiClass = 'high';
+                else if (d.nilaiAkhir < 60) nilaiClass = 'low';
+
+                html += `
+                    <tr>
+                        <td>${i + 1}</td>
+                        <td><strong>${escapeHtml(d.mapel)}</strong></td>
+                        <td><span class="badge-kode">${KODE_LABEL[d.kode] || d.kode}</span></td>
+                        <td>${d.nilaiPG} / ${d.totalPG}</td>
+                        <td>${d.nilaiPGK} / ${d.totalPGK}</td>
+                        <td>${d.nilaiBS} / ${d.totalBS}</td>
+                        <td><span class="badge-nilai ${nilaiClass}">${d.nilaiAkhir}</span></td>
+                        <td style="font-size:12px;color:#64748b;">${d.tanggal}</td>
+                    </tr>
+                `;
+            });
+            tbody.innerHTML = html;
+        }
+
+        // ==================== ESCAPE HTML ====================
         function escapeHtml(text) {
             if (!text) return '';
             const div = document.createElement('div');
             div.textContent = text;
             return div.innerHTML;
         }
-        
+
+        // ==================== ENTER KEY ====================
         document.getElementById('searchNIS').addEventListener('keypress', function(e) {
             if (e.key === 'Enter') cariHasilUjian();
         });
