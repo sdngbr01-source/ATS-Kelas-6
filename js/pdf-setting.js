@@ -728,7 +728,7 @@ async function generateRaporKelasPDF(siswaList, kelas, setting, mapelFilter) {
         doc.setFontSize(8);
         
         const catatanLines = [
-            `• Nilai < ${KKM_DEFAULT} = Remidial, Nilai >= ${KKM_DEFAULT} = Pengayaan`,
+            `• Nilai < ${KKM_DEFAULT} : Remidial, Nilai >= ${KKM_DEFAULT} : Pengayaan`,
             `• Siswa wajib mengikuti Remidial untuk sampai kepada KKM`,
             `• Pengayaan bersifat opsional, bisa mengikuti atau tidak`
         ];
