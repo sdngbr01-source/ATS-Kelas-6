@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - ATS 2026</title>
+    <title>Login - ASAJ 2026</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
@@ -21,7 +21,6 @@
             overflow: hidden;
         }
         
-        /* Dekorasi background */
         body::before,
         body::after {
             content: '';
@@ -32,18 +31,14 @@
             z-index: 0;
         }
         body::before {
-            width: 400px;
-            height: 400px;
+            width: 400px; height: 400px;
             background: #2563eb;
-            top: -100px;
-            left: -100px;
+            top: -100px; left: -100px;
         }
         body::after {
-            width: 350px;
-            height: 350px;
+            width: 350px; height: 350px;
             background: #7c3aed;
-            bottom: -100px;
-            right: -100px;
+            bottom: -100px; right: -100px;
         }
         
         .login-container {
@@ -65,10 +60,7 @@
             to { opacity: 1; transform: translateY(0); }
         }
         
-        .login-header {
-            text-align: center;
-            margin-bottom: 30px;
-        }
+        .login-header { text-align: center; margin-bottom: 30px; }
         
         .info-badge {
             background: #dbeafe;
@@ -95,14 +87,9 @@
             gap: 10px;
         }
         
-        .login-header p {
-            color: #64748b;
-            font-size: 0.85rem;
-        }
+        .login-header p { color: #64748b; font-size: 0.85rem; }
         
-        .form-group {
-            margin-bottom: 18px;
-        }
+        .form-group { margin-bottom: 18px; }
         
         .form-group label {
             display: block;
@@ -112,10 +99,7 @@
             font-size: 0.85rem;
         }
         
-        .form-group label i {
-            color: #3b82f6;
-            margin-right: 4px;
-        }
+        .form-group label i { color: #3b82f6; margin-right: 4px; }
         
         .form-group input {
             width: 100%;
@@ -167,15 +151,9 @@
             box-shadow: 0 10px 20px -5px rgba(37,99,235,0.4);
         }
         
-        .btn-login:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
+        .btn-login:disabled { opacity: 0.6; cursor: not-allowed; }
         
-        .login-footer {
-            text-align: center;
-            margin-top: 25px;
-        }
+        .login-footer { text-align: center; margin-top: 25px; }
         
         .login-footer a {
             color: #64748b;
@@ -184,9 +162,7 @@
             transition: color 0.3s;
         }
         
-        .login-footer a:hover {
-            color: #2563eb;
-        }
+        .login-footer a:hover { color: #2563eb; }
         
         .alert {
             background: #fee2e2;
@@ -201,9 +177,7 @@
             animation: shake 0.4s;
         }
         
-        .alert.show {
-            display: flex;
-        }
+        .alert.show { display: flex; }
         
         @keyframes shake {
             0%, 100% { transform: translateX(0); }
@@ -211,21 +185,16 @@
             75% { transform: translateX(5px); }
         }
         
-        /* Loading spinner */
         .spinner {
-            width: 16px;
-            height: 16px;
+            width: 16px; height: 16px;
             border: 2px solid rgba(255,255,255,0.3);
             border-top-color: white;
             border-radius: 50%;
             animation: spin 0.6s linear infinite;
         }
         
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
+        @keyframes spin { to { transform: rotate(360deg); } }
         
-        /* Info box untuk siswa */
         .info-box {
             background: #f0f9ff;
             border-left: 4px solid #3b82f6;
@@ -239,10 +208,7 @@
             gap: 10px;
         }
         
-        .info-box i {
-            margin-top: 2px;
-            color: #3b82f6;
-        }
+        .info-box i { margin-top: 2px; color: #3b82f6; }
         
         @media (max-width: 480px) {
             .login-container { padding: 30px 20px; }
@@ -263,7 +229,6 @@
             <span id="alertMessage">Error message</span>
         </div>
         
-        <!-- FORM (TANPA atribut required, validasi via JS) -->
         <form id="loginForm" novalidate>
             
             <!-- ============ FORM SISWA ============ -->
@@ -322,10 +287,15 @@
     
     <script>
     // ============================================================
-    // LOGIN - REBUILD 2025
-    // Siswa: hanya NISN (tanpa password)
-    // Admin: username + password
+    // LOGIN - REBUILD 2025 (v2)
+    // Siswa : NISN saja
+    // Admin : username + password
+    // NISN_BEBAS_JAM : NISN yang boleh login kapan saja (telaah soal)
     // ============================================================
+    
+    // ==== KONFIGURASI WHITELIST ====
+    // NISN di sini bebas login kapan saja (tidak kena cek jam sekolah)
+    const NISN_BEBAS_JAM = ['20524756'];
     
     const urlParams = new URLSearchParams(window.location.search);
     const role = (urlParams.get('role') || 'siswa').toLowerCase();
@@ -380,11 +350,15 @@
         }, 5000);
     }
     
-    // ==================== CEK JAM AKSES ====================
+    // ==================== CEK JAM AKSES (WIB) ====================
+    // Jam sekolah: 07.30 - 11.59 WIB (12.00 sudah ditolak)
     function isSchoolHourWIB() {
-        const hour = new Date().getHours();
-        // Jam 07:00 - 11:59
-        return hour >= 7 && hour < 12; }
+        const now = new Date();
+        // Konversi ke WIB (UTC+7)
+        const wib = new Date(now.getTime() + (7 * 60 + now.getTimezoneOffset()) * 60000);
+        const totalMinutes = wib.getHours() * 60 + wib.getMinutes();
+        return totalMinutes >= (7 * 60 + 30) && totalMinutes < (12 * 60);
+    }
     
     // ==================== LOADING STATE ====================
     function setLoading(isLoading) {
@@ -419,21 +393,25 @@
             setLoading(true);
             
             try {
-                // Cek jam akses
-                if (!isSchoolHourWIB()) {
+                // ---- Cek jam akses (dengan pengecualian NISN whitelist) ----
+                const isBebasJam = NISN_BEBAS_JAM.includes(nisn);
+                
+                if (isBebasJam) {
+                    console.log('ℹ️ NISN bebas jam (mode telaah soal):', nisn);
+                } else if (!isSchoolHourWIB()) {
                     showAlert('Akses hanya diperbolehkan pada jam sekolah (07.30 - 12.00 WIB)!');
                     setLoading(false);
                     return;
                 }
                 
-                // Cek db tersedia
+                // ---- Cek db tersedia ----
                 if (typeof db === 'undefined') {
                     showAlert('Database belum siap. Refresh halaman.');
                     setLoading(false);
                     return;
                 }
                 
-                // Cari siswa berdasarkan NISN
+                // ---- Cari siswa berdasarkan NISN ----
                 const siswaQuery = await db.collection('users')
                     .where('nis', '==', nisn)
                     .where('role', '==', 'siswa')
@@ -455,13 +433,15 @@
                     return;
                 }
                 
-                // Simpan session
+                // ---- Simpan session ----
                 sessionStorage.setItem('currentUser', JSON.stringify({
                     id: siswaDoc.id,
-                    ...siswaData
+                    ...siswaData,
+                    bebasJam: isBebasJam // info tambahan (opsional)
                 }));
                 
-                console.log('✅ Login berhasil:', siswaData.nama, '- Kelas', siswaData.kelas);
+                console.log('✅ Login berhasil:', siswaData.nama, '- Kelas', siswaData.kelas,
+                            isBebasJam ? '(bebas jam)' : '');
                 showAlert(`Selamat datang, ${siswaData.nama}!`, 'success');
                 
                 setTimeout(() => {
