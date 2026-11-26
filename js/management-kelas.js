@@ -39,28 +39,32 @@ async function loadAllKelasDropdowns(forceRefresh = false) {
 
 function updateDropdownsFromCache() {
     if (!kelasCache) return;
-    
-    const kelasOptions = '<option value="">Pilih Kelas</option>' + 
-        kelasCache.map(kelas => `<option value="${kelas.namaKelas}">${kelas.namaKelas}</option>`).join('');
-    
-    const kelasOptionsAll = '<option value="">Semua Kelas</option>' + 
-        kelasCache.map(kelas => `<option value="${kelas.namaKelas}">${kelas.namaKelas}</option>`).join('');
-    
+
+    const kelasOptions = '<option value="">Pilih Kelas</option>' +
+        kelasCache.map(k => `<option value="${k.namaKelas}">${k.namaKelas}</option>`).join('');
+
+    const kelasOptionsAll = '<option value="">Semua Kelas</option>' +
+        kelasCache.map(k => `<option value="${k.namaKelas}">${k.namaKelas}</option>`).join('');
+
     const dropdowns = [
-        'filterKelasUser', 'filterKelasSoal', 'settingKelas', 
-        'filterKelasNilai', 'filterKelasKoreksi', 'laporanKelas', 'generateKelas', 'uploadKelas'
+        'filterKelasUser', 'filterKelasSoal',
+        'filterKelasNilai', 'filterKelasKoreksi',
+        'laporanKelas', 'generateKelas'
     ];
-    
+
     dropdowns.forEach(id => {
         const element = document.getElementById(id);
-        if (element) {
-            if (id === 'filterKelasUser' || id === 'filterKelasNilai') {
-                element.innerHTML = kelasOptionsAll;
-            } else {
-                element.innerHTML = kelasOptions;
-            }
+        if (!element) return;
+        if (id === 'filterKelasUser' || id === 'filterKelasNilai') {
+            element.innerHTML = kelasOptionsAll;
+        } else {
+            element.innerHTML = kelasOptions;
         }
     });
+
+    // 🔥 Refresh checkbox multi-kelas
+    if (typeof renderUploadKelasCheckbox === 'function') renderUploadKelasCheckbox();
+    if (typeof renderSettingKelasCheckbox === 'function') renderSettingKelasCheckbox();
 }
 
 // Load dan tampilkan daftar kelas di tabel
